@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "properties": {
+      "application.major.version": "2",
+      "email": "gordon.ramsay@bytetoeat.com",
+      "owner": "Gordon Ramsay"
+    }
+  },
+  "schema": "{\"fields\":[{\"name\":\"event_id\",\"type\":\"string\"},{\"name\":\"recipe_id\",\"type\":\"string\"},{\"confluent:tags\":[\"PII\"],\"name\":\"chef_first_name\",\"type\":\"string\"},{\"confluent:tags\":[\"PII\"],\"name\":\"chef_last_name\",\"type\":\"string\"},{\"name\":\"recipe_name\",\"type\":\"string\"},{\"name\":\"ingredients\",\"type\":{\"items\":{\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"quantity\",\"type\":\"int\"},{\"name\":\"unit\",\"type\":\"string\"}],\"name\":\"Ingredient\",\"type\":\"record\"},\"type\":\"array\"}},{\"name\":\"cook_time_minutes\",\"type\":\"int\"},{\"name\":\"spice_level\",\"type\":{\"name\":\"SpiceLevel\",\"symbols\":[\"mild\",\"medium\",\"hot\"],\"type\":\"enum\"}},{\"name\":\"calories\",\"type\":\"int\"},{\"name\":\"created_at\",\"type\":{\"logicalType\":\"timestamp-millis\",\"type\":\"long\"}},{\"name\":\"steps\",\"type\":{\"items\":\"string\",\"type\":\"array\"}}],\"name\":\"Recipe\",\"namespace\":\"io.confluent.wvella.demo.datacontractsv2\",\"type\":\"record\"}",
+  "ruleSet": {
+    "migrationRules": [
+      {
+        "name": "split_chef_first_and_last_name",
+        "doc":  "Consumer is on new major version and needs the chef name split.",
+        "kind": "TRANSFORM",
+        "type": "JSONATA",
+        "mode": "UPGRADE",
+        "expr": "$merge([$sift($, function($v, $k) { $k != 'chef_name' }), { 'chef_first_name': $split(chef_name, ' ')[1], 'chef_last_name': $split(chef_name, ' ')[2] }])"
+      },
+      {
+        "name": "join_chef_first_and_last_name",
+        "doc":  "Consumer is on old major version and needs the chef name joined.",
+        "kind": "TRANSFORM",
+        "type": "JSONATA",
+        "mode": "DOWNGRADE",
+        "expr": "$merge([$sift($, function($v, $k) { $k != 'chef_first_name' and $k != 'chef_last_name' }), { 'chef_name': chef_first_name & ' ' & chef_last_name }])"
+      }
+    ],
+    "domainRules": [
+      {
+        "name": "require_more_than_one_ingredient",
+        "doc": "Check the ingredients list has more than 1 ingredient",
+        "kind": "CONDITION",
+        "mode": "WRITE",
+        "type": "CEL",
+        "params": {
+          "dlq.topic": "raw.recipes.dlq"
+        },
+        "expr": "size(message.ingredients) > 1",
+        "onSuccess": "NONE",
+        "onFailure": "DLQ",
+        "disabled": false
+      },
+      {
+        "name": "transform_recipe_name_to_valid_recipe_id",
+        "doc": "Tranform the name of a recipe to a valid id",
+        "kind": "TRANSFORM",
+        "mode": "WRITE",
+        "type": "CEL_FIELD",
+        "params": {
+          "dlq.topic": "raw.recipes.dlq"
+        },
+        "expr": "name == 'recipe_id' ; 'id-recipe-' + value.lowerAscii().split(' ').filter(w, w != '').join('-')",
+        "onSuccess": "NONE",
+        "onFailure": "DLQ",
+        "disabled": false
+      }
+    ]
+  },
+  "schemaType": "AVRO"
+}
