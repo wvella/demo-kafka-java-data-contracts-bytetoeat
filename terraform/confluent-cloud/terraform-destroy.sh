@@ -34,3 +34,7 @@ echo "Terraform destroy completed successfully."
 echo "Cleaning up Terraform state files..."
 rm -f terraform.tfstate terraform.tfstate.backup .terraform.lock.hcl
 rm -rf .terraform/
+
+# Step 4: Cleanup Terraform files
+echo "Cleaning up command and cloud-specific Terraform files..."
+rm -f *.tf *.tfvars

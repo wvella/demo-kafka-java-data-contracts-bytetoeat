@@ -2,6 +2,31 @@
 # Variables
 TERRAFORM_DIR="." # Update this to the directory containing your Terraform configuration
 
+CLOUD="$1"
+if [[ "$CLOUD" != "aws" && "$CLOUD" != "azure" && "$CLOUD" != "gcp" ]]; then
+  echo "Usage: $0 [aws|azure|gcp]"
+  exit 1
+fi
+
+# Remove cloud-specific files from the current directory (not subdirectories)
+find . -maxdepth 1 -type f \( -name "*aws*" -o -name "*azure*" -o -name "*gcp*" \) -exec rm -f {} +
+
+# Copy common files (files that do NOT contain any cloud name)
+for f in ./all-in-one/*; do
+  if [[ -f "$f" && "$f" != *aws* && "$f" != *azure* && "$f" != *gcp* ]]; then
+    cp "$f" .
+  fi
+done
+
+# Copy selected cloud's files into the current directory
+for f in ./all-in-one/*$CLOUD*; do
+  if [[ -f "$f" ]]; then
+    cp "$f" .
+  fi
+done
+
+echo "Switched to $CLOUD."
+
 # Step 0: Set up Python virtual environment
 if [ -d "my-tf-venv" ]; then
   echo "Virtual environment 'my-tf-venv' already exists."

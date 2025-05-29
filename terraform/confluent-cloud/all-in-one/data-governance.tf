@@ -111,7 +111,7 @@ resource "confluent_schema" "raw_orders-value" {
       mode   = "WRITEREAD"
       tags   = [confluent_tag.pii.name]
       params = {
-        "encrypt.kek.name" = confluent_schema_registry_kek.aws_kek.name
+        "encrypt.kek.name" = confluent_schema_registry_kek.kek.name
       }
       on_failure = "ERROR,NONE"
     }

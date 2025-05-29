@@ -17,8 +17,3 @@ variable "tenant_id" {
   description = "The Azure tenant ID in which Subscription exists"
   type        = string
 }
-
-variable "resource_group" {
-  description = "The name of the Azure Resource Group that the virtual network belongs to"
-  type        = string
-}

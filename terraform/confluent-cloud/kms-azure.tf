@@ -1,17 +1,21 @@
-data "azurerm_resource_group" "my-resource-group" {
-  name = var.resource_group
-}
-
 data "azurerm_client_config" "current" {}
 
 data "azuread_service_principal" "current" {
   client_id = var.client_id
 }
 
+resource "azurerm_resource_group" "csfle-bytetoeat-demo" {
+  name     = "csfle-bytetoeat-demo-${random_id.short.hex}"
+  location = var.region
+  tags = {
+    owner_email = "wvella@confluent.io"
+    }
+}
+
 resource "azurerm_key_vault" "csfle-keyvault" {
-  name                        = "csfle-keyvault"
-  location                    = data.azurerm_resource_group.my-resource-group.location
-  resource_group_name         = data.azurerm_resource_group.my-resource-group.name
+  name                        = "csfle-keyvault-${random_id.short.hex}"
+  location                    = azurerm_resource_group.csfle-bytetoeat-demo.location
+  resource_group_name         = azurerm_resource_group.csfle-bytetoeat-demo.name
   enabled_for_disk_encryption = true
   tenant_id                   = var.tenant_id
   soft_delete_retention_days  = 7

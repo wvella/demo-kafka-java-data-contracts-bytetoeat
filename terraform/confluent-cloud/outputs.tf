@@ -12,10 +12,6 @@ output "kafka-url" {
 output "schema-registry-url" {
   value     = data.confluent_schema_registry_cluster.advanced.rest_endpoint
 }
-output "raw-recipes-schema-identifier" {
-  value     = confluent_schema.raw_recipes-value.schema_identifier
-  sensitive = true
-}
 output "app-producer-schema-registry-api-key" {
   value     = confluent_api_key.app-producer-schema-registry-api-key.id
   sensitive = true

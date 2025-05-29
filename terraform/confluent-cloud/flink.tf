@@ -4,7 +4,7 @@ locals {
 
 // Service account to perform a task within Confluent Cloud, such as executing a Flink statement
 resource "confluent_service_account" "statements-runner" {
-  display_name = "statements-runner"
+  display_name = "statements-runner-${random_id.short.hex}"
   description  = "Service account for running Flink Statements in the 'restaurants' Kafka cluster"
 }
 
@@ -34,7 +34,7 @@ resource "confluent_role_binding" "statements-runner-enriched-orders-developer-w
 
 // Service account that owns Flink API Key
 resource "confluent_service_account" "app-manager-flink" {
-  display_name = "app-manager-flink"
+  display_name = "app-manager-flink-${random_id.short.hex}"
   description  = "Service account that has full access to Flink resources in an environment"
 }
 
@@ -73,7 +73,7 @@ data "confluent_flink_region" "flink-region" {
   region = local.region
 }
 resource "confluent_api_key" "app-manager-flink-api-key" {
-  display_name = "app-manager-flink-api-key"
+  display_name = "app-manager-flink-api-key-${random_id.short.hex}"
   description  = "Flink API Key that is owned by 'app-manager-flink' service account"
   owner {
     id          = confluent_service_account.app-manager-flink.id
@@ -98,7 +98,7 @@ resource "confluent_api_key" "app-manager-flink-api-key" {
 
 # https://docs.confluent.io/cloud/current/flink/get-started/quick-start-cloud-console.html#step-1-create-a-af-compute-pool
 resource "confluent_flink_compute_pool" "flink_compute_pool" {
-  display_name = "flink-compute-pool"
+  display_name = "flink-compute-pool-${random_id.short.hex}"
   cloud        = local.cloud
   region       = local.region
   max_cfu      = 10
