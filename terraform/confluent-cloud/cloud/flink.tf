@@ -4,7 +4,7 @@ locals {
 
 // Service account to perform a task within Confluent Cloud, such as executing a Flink statement
 resource "confluent_service_account" "statements-runner" {
-  display_name = "statements-runner"
+  display_name = "statements-runner-${var.unique-id}"
   description  = "Service account for running Flink Statements in the 'restaurants' Kafka cluster"
 }
 
@@ -14,13 +14,13 @@ resource "confluent_role_binding" "statements-runner-environment-admin" {
   crn_pattern = confluent_environment.bytetoeat.resource_name
 }
 
-resource "confluent_role_binding" "statements-runner-orders-developer-read" {
+resource "confluent_role_binding" "statements-runner-recipes-developer-read" {
   principal   = "User:${confluent_service_account.statements-runner.id}"
   role_name   = "DeveloperRead"
   crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/topic=${confluent_kafka_topic.raw_recipes.topic_name}"
 }
 
-resource "confluent_role_binding" "statements-runner-recipes-developer-read" {
+resource "confluent_role_binding" "statements-runner-orders-developer-read" {
   principal   = "User:${confluent_service_account.statements-runner.id}"
   role_name   = "DeveloperRead"
   crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/topic=${confluent_kafka_topic.raw_orders.topic_name}"
@@ -34,7 +34,7 @@ resource "confluent_role_binding" "statements-runner-enriched-orders-developer-w
 
 // Service account that owns Flink API Key
 resource "confluent_service_account" "app-manager-flink" {
-  display_name = "app-manager-flink"
+  display_name = "app-manager-flink-${var.unique-id}"
   description  = "Service account that has full access to Flink resources in an environment"
 }
 
@@ -69,11 +69,11 @@ resource "confluent_role_binding" "app-manager-flink-assigner" {
   crn_pattern = "${data.confluent_organization.Confluent.resource_name}/service-account=${confluent_service_account.statements-runner.id}"
 }
 data "confluent_flink_region" "flink-region" {
-  cloud  = local.cloud
-  region = local.region
+  cloud  = var.cloud
+  region = var.region
 }
 resource "confluent_api_key" "app-manager-flink-api-key" {
-  display_name = "app-manager-flink-api-key"
+  display_name = "app-manager-flink-api-key-${var.unique-id}"
   description  = "Flink API Key that is owned by 'app-manager-flink' service account"
   owner {
     id          = confluent_service_account.app-manager-flink.id
@@ -98,9 +98,9 @@ resource "confluent_api_key" "app-manager-flink-api-key" {
 
 # https://docs.confluent.io/cloud/current/flink/get-started/quick-start-cloud-console.html#step-1-create-a-af-compute-pool
 resource "confluent_flink_compute_pool" "flink_compute_pool" {
-  display_name = "flink-compute-pool"
-  cloud        = local.cloud
-  region       = local.region
+  display_name = "flink-compute-pool-${var.unique-id}"
+  cloud        = var.cloud
+  region       = var.region
   max_cfu      = 10
   environment {
     id = confluent_environment.bytetoeat.id
@@ -126,7 +126,7 @@ resource "confluent_flink_statement" "enrich-orders" {
     id = confluent_service_account.statements-runner.id
   }
   # https://docs.confluent.io/cloud/current/flink/reference/example-data.html#marketplace-database
-  statement = file("./statements/enriched-orders.sql")
+  statement = file("statements/enriched-orders.sql")
   properties = {
     "sql.current-catalog"  = confluent_environment.bytetoeat.display_name
     "sql.current-database" = confluent_kafka_cluster.standard.display_name
@@ -156,7 +156,7 @@ resource "confluent_flink_statement" "alter-watermark" {
   principal {
     id = confluent_service_account.statements-runner.id
   }
-  statement = file("./statements/alter-watermark.sql")
+  statement = file("statements/alter-watermark.sql")
   properties = {
     "sql.current-catalog"  = confluent_environment.bytetoeat.display_name
     "sql.current-database" = confluent_kafka_cluster.standard.display_name

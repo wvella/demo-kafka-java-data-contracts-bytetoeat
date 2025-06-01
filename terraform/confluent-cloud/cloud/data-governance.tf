@@ -5,7 +5,7 @@ resource "confluent_schema" "raw_recipes-value" {
   rest_endpoint      = data.confluent_schema_registry_cluster.advanced.rest_endpoint
   subject_name       = "raw.recipes-value"
   format             = "AVRO"
-  schema             = file("../../byte-to-eat-v1/src/main/resources/avro/schema-raw.recipe-value.avsc")
+  schema             = file("../../../byte-to-eat-v1/src/main/resources/avro/schema-raw.recipe-value.avsc")
   recreate_on_update = false
   hard_delete        = true
 
@@ -72,7 +72,7 @@ resource "confluent_schema" "raw_orders-value" {
   rest_endpoint      = data.confluent_schema_registry_cluster.advanced.rest_endpoint
   subject_name       = "raw.orders-value"
   format             = "AVRO"
-  schema             = file("../../byte-to-eat-v1/src/main/resources/avro/schema-raw.order-value.avsc")
+  schema             = file("../../../byte-to-eat-v1/src/main/resources/avro/schema-raw.order-value.avsc")
   recreate_on_update = false
   hard_delete        = true
 
@@ -111,7 +111,7 @@ resource "confluent_schema" "raw_orders-value" {
       mode   = "WRITEREAD"
       tags   = [confluent_tag.pii.name]
       params = {
-        "encrypt.kek.name" = confluent_schema_registry_kek.kek.name
+        "encrypt.kek.name" = confluent_schema_registry_kek.cc-kek.name
       }
       on_failure = "ERROR,NONE"
     }
@@ -151,7 +151,7 @@ resource "confluent_schema" "enriched-orders-value" {
   rest_endpoint      = data.confluent_schema_registry_cluster.advanced.rest_endpoint
   subject_name       = "enriched_orders-value"
   format             = "AVRO"
-  schema             = file("../../byte-to-eat-v1/src/main/resources/avro/schema-enriched_orders-value.avsc")
+  schema             = file("../../../byte-to-eat-v1/src/main/resources/avro/schema-enriched_orders-value.avsc")
   recreate_on_update = false
   hard_delete        = true
 

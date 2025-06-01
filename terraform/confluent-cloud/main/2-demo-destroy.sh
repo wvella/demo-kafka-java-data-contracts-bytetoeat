@@ -1,15 +1,38 @@
 #!/bin/bash
 # Variables
 TERRAFORM_DIR="." # Update this to the directory containing your Terraform configuration
-DELETE_SUBJECT_SCRIPT="./delete-subject.sh" # Path to the delete-subject.sh script
+DELETE_SUBJECT_SCRIPT="./helper-scripts/delete-subject.sh" # Path to the delete-subject.sh script
+DELETE_AZURE_SCRIPT="../main/helper-scripts/delete-azure-apps.sh" # Path to the delete-azure-apps.sh script
+TFVARS_FILE="../tf-working/azure-terraform-secret.auto.tfvars"
 
 CLOUD="$1"
+REGION="$2"
+
 if [[ "$CLOUD" != "aws" && "$CLOUD" != "azure" && "$CLOUD" != "gcp" ]]; then
-  echo "Usage: $0 [aws|azure|gcp]"
+  echo "Usage: $0 [aws|azure|gcp] <region>"
   exit 1
 fi
 
-# Step 1: Call delete-subject.sh to delete the subject
+if [[ -z "$REGION" ]]; then
+  echo "Usage: $0 [aws|azure|gcp] <region>"
+  echo "Error: Region must be specified as the second argument."
+  exit 1
+fi
+
+# Extract unique-id from the tfvars file
+if [[ ! -f "$TFVARS_FILE" ]]; then
+  echo "❌ $TFVARS_FILE not found."
+  exit 1
+fi
+
+UNIQUE_ID=$(grep '^unique-id' "$TFVARS_FILE" | sed 's/.*= *"\(.*\)"/\1/')
+
+if [[ -z "$UNIQUE_ID" ]]; then
+  echo "❌ unique-id not found in $TFVARS_FILE."
+  exit 1
+fi
+
+# Call delete-subject.sh to delete the subject
 if [ -f "$DELETE_SUBJECT_SCRIPT" ]; then
   echo "Running delete-subject.sh to delete the subject..."
   bash "$DELETE_SUBJECT_SCRIPT"
@@ -24,9 +47,9 @@ fi
 
 # Wait for 2 minutes to ensure the subject is deleted before proceeding
 echo "Waiting for 2 minutes to ensure the subject is deleted..."
-sleep 120
+#sleep 120
 
-# Step 2: Build var-file arguments
+# Build var-file arguments
 VAR_FILES=()
 
 if [ -f "$TERRAFORM_DIR/terraform.tfvars" ]; then
@@ -42,7 +65,7 @@ for cloud in aws azure gcp; do
   fi
 done
 
-# Step 3: Run terraform destroy
+# Run terraform destroy
 echo "Running terraform destroy..."
 terraform -chdir="$TERRAFORM_DIR" destroy "${VAR_FILES[@]}" -auto-approve
 if [ $? -ne 0 ]; then
@@ -52,11 +75,25 @@ fi
 
 echo "Terraform destroy completed successfully."
 
-# Step 4: Cleanup Terraform state files
+# Cleanup Terraform state files
+cd ../tf-working
 echo "Cleaning up Terraform state files..."
 rm -f terraform.tfstate terraform.tfstate.backup .terraform.lock.hcl
 rm -rf .terraform/
 
-# Step 5: Cleanup Terraform files
+# Cleanup Terraform files
 echo "Cleaning up command and cloud-specific Terraform files..."
 rm -f *.tf *.tfvars
+
+# Call delete-azure-apps.sh to delete the azure resource groups and apps
+if [ -f "$DELETE_AZURE_SCRIPT" ]; then
+  echo "Running delete-azure-apps.sh to delete the subject..."
+  bash "$DELETE_AZURE_SCRIPT" "$UNIQUE_ID"
+  if [ $? -ne 0 ]; then
+    echo "Error: delete-azure-apps.sh failed. Aborting Terraform destroy."
+    exit 1
+  fi
+else
+  echo "Error: delete-azure-apps.sh not found at $DELETE_AZURE_SCRIPT. Aborting."
+  exit 1
+fi

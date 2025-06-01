@@ -3,45 +3,57 @@
 TERRAFORM_DIR="." # Update this to the directory containing your Terraform configuration
 
 CLOUD="$1"
+REGION="$2"
+
 if [[ "$CLOUD" != "aws" && "$CLOUD" != "azure" && "$CLOUD" != "gcp" ]]; then
-  echo "Usage: $0 [aws|azure|gcp]"
+  echo "Usage: $0 [aws|azure|gcp] <region>"
+  exit 1
+fi
+
+if [[ -z "$REGION" ]]; then
+  echo "Usage: $0 [aws|azure|gcp] <region>"
+  echo "Error: Region must be specified as the second argument."
   exit 1
 fi
 
 # Remove cloud-specific files from the current directory (not subdirectories)
-find . -maxdepth 1 -type f \( -name "*aws*" -o -name "*azure*" -o -name "*gcp*" \) -exec rm -f {} +
+find ../tf-working/ -maxdepth 1 -type f \( -name "*aws*" -o -name "*azure*" -o -name "*gcp*" \) ! -name "azure-terraform-secret.auto.tfvars" -exec rm -f {} +
 
 # Copy common files (files that do NOT contain any cloud name)
-for f in ./all-in-one/*; do
+for f in ../cloud/*; do
   if [[ -f "$f" && "$f" != *aws* && "$f" != *azure* && "$f" != *gcp* ]]; then
-    cp "$f" .
+    cp "$f" ../tf-working/
   fi
 done
+
+# Copy Flink statement files
+cp -r ../cloud/statements ../tf-working/
 
 # Copy selected cloud's files into the current directory
-for f in ./all-in-one/*$CLOUD*; do
+for f in ../cloud/*$CLOUD*; do
   if [[ -f "$f" ]]; then
-    cp "$f" .
+    cp "$f" ../tf-working/
   fi
 done
 
-echo "Switched to $CLOUD."
+echo "Applying Terraform to $CLOUD."
 
-# Step 0: Set up Python virtual environment
+cd ../tf-working || { echo "Error: Could not change to tf-working directory."; exit 1; }
+# Set up Python virtual environment
 if [ -d "my-tf-venv" ]; then
   echo "Virtual environment 'my-tf-venv' already exists."
 else
   python3 -m venv my-tf-venv
   if [ -d "my-tf-venv" ]; then
     source my-tf-venv/bin/activate
-    pip install requests
+    pip install -r requirements.txt
     echo "Virtual environment 'my-tf-venv' created and 'requests' installed."
   else
     echo "Failed to create virtual environment 'my-tf-venv'."
   fi
 fi
 
-# Step 1: Initialize Terraform
+# Initialize Terraform
 echo "Initializing Terraform..."
 terraform -chdir="$TERRAFORM_DIR" init
 if [ $? -ne 0 ]; then
@@ -49,9 +61,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Step 2: Build var-file arguments
+# Build var-file arguments
 VAR_FILES=()
 
+# terraform.auto.tfvars is always loaded
 if [ -f "$TERRAFORM_DIR/terraform.tfvars" ]; then
   VAR_FILES+=("-var-file=terraform.tfvars")
   echo "Using variable file: terraform.tfvars"
@@ -65,7 +78,23 @@ for cloud in aws azure gcp; do
   fi
 done
 
-# Step 3: Run terraform apply
+# Only one cloud can be selected; run cloud-specific prerequisites if needed
+if [[ "$CLOUD" == "azure" ]]; then
+  echo "🔵 Azure selected: running create-azure-apps.sh for region $REGION..."
+  ../main/helper-scripts/create-azure-apps.sh "$REGION"
+  if [ $? -ne 0 ]; then
+    echo "Error: create-azure-apps.sh failed."
+    exit 1
+  fi
+elif [[ "$CLOUD" == "aws" ]]; then
+  echo "🟢 AWS selected: (placeholder) run your AWS prerequisites script here..."
+  # ./create-aws-resources.sh
+elif [[ "$CLOUD" == "gcp" ]]; then
+  echo "🟡 GCP selected: (placeholder) run your GCP prerequisites script here..."
+  # ./create-gcp-resources.sh
+fi
+
+# Run terraform apply
 echo "Running terraform apply..."
 terraform -chdir="$TERRAFORM_DIR" apply "${VAR_FILES[@]}" -auto-approve
 if [ $? -ne 0 ]; then
@@ -75,9 +104,9 @@ fi
 
 echo "Terraform apply completed successfully."
 
-# Step 4: Create a recipe
+# Create a recipe
 echo "Running recipe creation..."
-cd ../../byte-to-eat-v1/
+cd ../../../byte-to-eat-v1/
 RECIPE_SCRIPT="run-producer-recipe.sh"
 
 if [ -f "$RECIPE_SCRIPT" ]; then

@@ -9,13 +9,3 @@ variable "confluent_cloud_api_secret" {
   type        = string
   sensitive   = true
 }
-
-variable "cloud" {
-  description = "The cloud"
-  type        = string
-}
-
-variable "region" {
-  description = "The region"
-  type        = string
-}
