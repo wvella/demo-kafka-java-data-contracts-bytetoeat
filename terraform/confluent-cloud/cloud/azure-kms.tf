@@ -15,6 +15,12 @@ data "external" "get-kek-policy" {
 
 data "external" "add-azure-role-assignment" {
   program = ["${path.module}/../main/helper-scripts/add-azure-role-assignment.sh","${var.unique-id}"]
+  depends_on = [
+    azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault,
+    azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault-shared,
+    azurerm_key_vault_key.demo-data-contracts-bytetoeat-csfle-key,
+    azurerm_key_vault_key.demo-data-contracts-bytetoeat-csfle-key-shared
+  ]
 }
 
 output "add-azure-role-assignment" {
@@ -39,7 +45,7 @@ resource "azurerm_user_assigned_identity" "demo-data-contracts-bytetoeat-cc-iden
 
 resource "azurerm_role_definition" "demo-data-contracts-bytetoeat-cc-role" {
   name        = "${var.unique-id}-cc-role"
-  scope       = azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault.id
+  scope       = azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault-shared.id
 
   description = "Custom role for Confluent Schema Registry Key Vault Access to read, encrypt, and decrypt"
   permissions {
@@ -53,12 +59,12 @@ resource "azurerm_role_definition" "demo-data-contracts-bytetoeat-cc-role" {
     ]
     not_data_actions = []
   }
-  assignable_scopes = [azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault.id]
+  assignable_scopes = [azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault-shared.id]
   depends_on = [ data.external.add-azure-role-assignment ]
 }
 
 resource "azurerm_role_assignment" "demo-data-contracts-bytetoeat-cc-role-assignment" {
-  scope              = azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault.id
+  scope              = azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault-shared.id
   role_definition_id = azurerm_role_definition.demo-data-contracts-bytetoeat-cc-role.role_definition_resource_id
   principal_id       = azurerm_user_assigned_identity.demo-data-contracts-bytetoeat-cc-identity.principal_id
 }
@@ -72,8 +78,8 @@ resource "azurerm_federated_identity_credential" "demo-data-contracts-bytetoeat-
   parent_id            = azurerm_user_assigned_identity.demo-data-contracts-bytetoeat-cc-identity.id
 }
 
-resource "azurerm_key_vault" "demo-data-contracts-bytetoeat-keyvault" {
-  name                        = "bytetoeat-${var.unique-id}-kv" # The name must begin with a letter, end with a letter or digit, and not contain consecutive hyphens.
+resource "azurerm_key_vault" "demo-data-contracts-bytetoeat-keyvault-shared" {
+  name                        = "bte-${var.unique-id}-kv-shared" # The name must begin with a letter, end with a letter or digit, and not contain consecutive hyphens.
   location                    = data.azurerm_resource_group.resource-group.location
   resource_group_name         = data.azurerm_resource_group.resource-group.name
   enabled_for_disk_encryption = true
@@ -81,9 +87,36 @@ resource "azurerm_key_vault" "demo-data-contracts-bytetoeat-keyvault" {
   soft_delete_retention_days  = 7
   purge_protection_enabled    = true
   enable_rbac_authorization   = true
-
   sku_name = "standard"
+}
 
+resource "azurerm_key_vault" "demo-data-contracts-bytetoeat-keyvault" {
+  name                        = "bte-${var.unique-id}-kv" # The name must begin with a letter, end with a letter or digit, and not contain consecutive hyphens.
+  location                    = data.azurerm_resource_group.resource-group.location
+  resource_group_name         = data.azurerm_resource_group.resource-group.name
+  enabled_for_disk_encryption = true
+  tenant_id                   = var.tenant-id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = true
+  enable_rbac_authorization   = true
+  sku_name = "standard"
+}
+
+# Create an Azure Key
+resource "azurerm_key_vault_key" "demo-data-contracts-bytetoeat-csfle-key-shared" {
+  name         = "${var.unique-id}-csfle-key-shared"
+  key_vault_id = azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault-shared.id
+  key_type     = "RSA"
+  key_size     = 2048
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
 }
 
 # Create an Azure Key
@@ -101,10 +134,9 @@ resource "azurerm_key_vault_key" "demo-data-contracts-bytetoeat-csfle-key" {
     "verify",
     "wrapKey",
   ]
-
 }
 
-resource "confluent_schema_registry_kek" "cc-kek" {
+resource "confluent_schema_registry_kek" "cc-kek-shared" {
   schema_registry_cluster {
     id = data.confluent_schema_registry_cluster.advanced.id
   }
@@ -116,7 +148,7 @@ resource "confluent_schema_registry_kek" "cc-kek" {
   name        = "bytetoeat-${var.unique-id}-kek-shared"
   doc         = "Azure Key Encryption Key used for CSFLE encryption"
   kms_type    = "azure-kms"
-  kms_key_id  = azurerm_key_vault_key.demo-data-contracts-bytetoeat-csfle-key.id
+  kms_key_id  = azurerm_key_vault_key.demo-data-contracts-bytetoeat-csfle-key-shared.id
   shared      = true
   hard_delete = true
 
@@ -124,4 +156,21 @@ resource "confluent_schema_registry_kek" "cc-kek" {
     "azure.tenant.id" = var.tenant-id
     "azure.client.id" = azurerm_user_assigned_identity.demo-data-contracts-bytetoeat-cc-identity.client_id
   }
+}
+
+resource "confluent_schema_registry_kek" "cc-kek" {
+  schema_registry_cluster {
+    id = data.confluent_schema_registry_cluster.advanced.id
+  }
+  rest_endpoint = data.confluent_schema_registry_cluster.advanced.rest_endpoint
+  credentials {
+    key    = confluent_api_key.env-manager-schema-registry-api-key.id
+    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+  }
+  name        = "bytetoeat-${var.unique-id}-kek"
+  doc         = "Azure Key Encryption Key used for CSFLE encryption"
+  kms_type    = "azure-kms"
+  kms_key_id  = azurerm_key_vault_key.demo-data-contracts-bytetoeat-csfle-key.id
+  shared      = false
+  hard_delete = true
 }

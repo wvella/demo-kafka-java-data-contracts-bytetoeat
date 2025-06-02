@@ -106,19 +106,19 @@ resource "confluent_role_binding" "app-consumer-schema-registry-api-key-develope
 resource "confluent_role_binding" "app-producer-schema-registry-api-key-developer-read-kek" {
   principal   = "User:${confluent_service_account.app-producer.id}"
   role_name   = "DeveloperRead"
-  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
 }
 
 resource "confluent_role_binding" "app-producer-schema-registry-api-key-developer-write-kek" {
   principal   = "User:${confluent_service_account.app-producer.id}"
   role_name   = "DeveloperWrite"
-  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
 }
 
 resource "confluent_role_binding" "app-consumer-schema-registry-api-key-developer-read-kek" {
   principal   = "User:${confluent_service_account.app-consumer.id}"
   role_name   = "DeveloperRead"
-  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
 }
 
 resource "confluent_api_key" "app-consumer-schema-registry-api-key" {

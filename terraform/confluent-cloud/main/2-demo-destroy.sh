@@ -47,7 +47,7 @@ fi
 
 # Wait for 2 minutes to ensure the subject is deleted before proceeding
 echo "Waiting for 2 minutes to ensure the subject is deleted..."
-#sleep 120
+sleep 120
 
 # Build var-file arguments
 VAR_FILES=()
@@ -84,6 +84,10 @@ rm -rf .terraform/
 # Cleanup Terraform files
 echo "Cleaning up command and cloud-specific Terraform files..."
 rm -f *.tf *.tfvars
+
+# Clean up the statements
+echo "Cleaning up the statements..."
+rm -rf statements
 
 # Call delete-azure-apps.sh to delete the azure resource groups and apps
 if [ -f "$DELETE_AZURE_SCRIPT" ]; then
