@@ -46,7 +46,7 @@ else
   python3 -m venv my-tf-venv
   if [ -d "my-tf-venv" ]; then
     source my-tf-venv/bin/activate
-    pip install -r requirements.txt
+    pip install -r ../main/helper-scripts/requirements.txt
     echo "Virtual environment 'my-tf-venv' created and 'requests' installed."
   else
     echo "Failed to create virtual environment 'my-tf-venv'."

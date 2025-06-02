@@ -5,7 +5,7 @@ data "azuread_service_principal" "current" {
 }
 
 data "external" "get-kek-policy" {
-  program = ["python3", "${path.module}/get-kek-policy.py"]
+  program = ["python3", "${path.module}/../main/helper-scripts/get-kek-policy.py"]
   query = {
     sr_url  = data.confluent_schema_registry_cluster.advanced.rest_endpoint
     api_key = confluent_api_key.env-manager-schema-registry-api-key.id
