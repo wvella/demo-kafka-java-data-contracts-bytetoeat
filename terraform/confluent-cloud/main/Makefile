@@ -1,5 +1,5 @@
 SEMVER=$(shell cat VERSION)
-DOCKER_USERNAME=username
+DOCKER_USERNAME=wvella
 
 SERVICE ?= NULL
 IMAGE_NAME ?= $(SERVICE)
@@ -19,7 +19,16 @@ java-build:
 	cd $(JAVA_BUILD_DIR) && mvn clean package
 
 build: java-build
-	docker build --tag $(IMAGE_NAME):$(IMAGE_TAG) -f $(DOCKER_DIR)/Dockerfile $(DOCKER_DIR)
+#For Intel use linux/amd64
+	docker buildx build --tag $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG) -f $(DOCKER_DIR)/Dockerfile $(DOCKER_DIR)
+
+docker-push:
+	docker tag $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG) $(DOCKER_USERNAME)/$(IMAGE_NAME):latest
+	docker push $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)
+	docker push $(DOCKER_USERNAME)/$(IMAGE_NAME):latest
+
+docker-inspect:
+	docker inspect $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG) --format='{{.Architecture}}'
 
 up:
 	./helper-scripts/generate-$(SERVICE)-config.sh

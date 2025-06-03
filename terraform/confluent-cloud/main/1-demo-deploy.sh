@@ -107,7 +107,7 @@ echo "Terraform apply completed successfully."
 # Run microservices
 echo "Running microservices ..."
 cd ../main
-RECIPE_SCRIPT="0-build.sh"
+RECIPE_SCRIPT="0-run.sh"
 
 if [ -f "$RECIPE_SCRIPT" ]; then
   ./"$RECIPE_SCRIPT"

@@ -21,6 +21,7 @@ This project demonstrates **4 key capabilities of Data Contracts**:
 
 #### Demo Architecture
 ![demo-architecture](demo.png)
+#TODO: Update image!
 
 #### Demo Recording
 See the `demo-recording-480p.mp4` file in the directory
@@ -90,7 +91,7 @@ See the `demo-recording-480p.mp4` file in the directory
           6. In the Confluent Cloud UI, add another `pii` tag to `customer_name` show the schema is instant. No code changes.
           7. Show the `raw.orders` Topic in the Confluent Cloud UI to show the `customer_name` field is now encrypted.
           8. **Bonus:** The consumer can only decrypt the field because it has access to the Key Encryption Key. Remove the access via the Confluent Cloud UI and the field won't be decrypted.
-          9.  **Bonus:** Flink is joining the `Orders` and `Recipes` together, and the encrypted field will be carried through.
+          9. **Bonus:** Flink is joining the `Orders` and `Recipes` together, and the encrypted field will be carried through.
       2. Key Not Shared with Confluent
          1. Same as *Key Shared with Confluent* above, except you need credentials configured in the applications in order to access the KMS.
    5. **Schema Migration Rules**
