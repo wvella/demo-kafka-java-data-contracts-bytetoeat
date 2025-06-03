@@ -5,7 +5,7 @@ resource "confluent_schema" "raw_recipes-value" {
   rest_endpoint      = data.confluent_schema_registry_cluster.advanced.rest_endpoint
   subject_name       = "raw.recipes-value"
   format             = "AVRO"
-  schema             = file("../../../byte-to-eat-v1/src/main/resources/avro/schema-raw.recipe-value.avsc")
+  schema             = file("../../../byte-to-eat-v1-docker-producer-recipes/src/main/resources/avro/schema-raw.recipe-value.avsc")
   recreate_on_update = false
   hard_delete        = true
 
@@ -51,6 +51,20 @@ resource "confluent_schema" "raw_recipes-value" {
       }
     }
     // END Data Transformation Rules
+    // START Data Encryption Rules
+    domain_rules {
+      name   = "encrypt_sensitive"
+      doc    = "Encrypt all fields which are tagged with sensitive"
+      kind   = "TRANSFORM"
+      type   = "ENCRYPT"
+      mode   = "WRITEREAD"
+      tags   = [confluent_tag.sensitive.name]
+      params = {
+        "encrypt.kek.name" = confluent_schema_registry_kek.cc-kek.name
+      }
+      on_failure = "ERROR,NONE"
+    }
+    // END Data Encryption Rules
   }
 
   credentials {
@@ -72,7 +86,7 @@ resource "confluent_schema" "raw_orders-value" {
   rest_endpoint      = data.confluent_schema_registry_cluster.advanced.rest_endpoint
   subject_name       = "raw.orders-value"
   format             = "AVRO"
-  schema             = file("../../../byte-to-eat-v1/src/main/resources/avro/schema-raw.order-value.avsc")
+  schema             = file("../../../byte-to-eat-v1-docker-producer-orders/src/main/resources/avro/schema-raw.order-value.avsc")
   recreate_on_update = false
   hard_delete        = true
 
@@ -144,6 +158,21 @@ resource "confluent_tag" "pii" {
 
 }
 
+resource "confluent_tag" "sensitive" {
+  schema_registry_cluster {
+    id = data.confluent_schema_registry_cluster.advanced.id
+  }
+  rest_endpoint = data.confluent_schema_registry_cluster.advanced.rest_endpoint
+  credentials {
+    key    = confluent_api_key.env-manager-schema-registry-api-key.id
+    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+  }
+
+  name        = "Sensitive"
+  description = "Sensitive tag"
+
+}
+
 resource "confluent_schema" "enriched-orders-value" {
   schema_registry_cluster {
     id = data.confluent_schema_registry_cluster.advanced.id
@@ -151,7 +180,7 @@ resource "confluent_schema" "enriched-orders-value" {
   rest_endpoint      = data.confluent_schema_registry_cluster.advanced.rest_endpoint
   subject_name       = "enriched_orders-value"
   format             = "AVRO"
-  schema             = file("../../../byte-to-eat-v1/src/main/resources/avro/schema-enriched_orders-value.avsc")
+  schema             = file("../../../byte-to-eat-v1-docker-producer-orders/src/main/resources/avro/schema-enriched_orders-value.avsc")
   recreate_on_update = false
   hard_delete        = true
 

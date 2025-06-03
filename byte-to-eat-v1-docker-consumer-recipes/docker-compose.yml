@@ -1,0 +1,6 @@
+services:
+  consumer:
+    image: byte-to-eat-v1-docker-consumer-recipes:1.0.0
+    container_name: byte-to-eat-consumer-ConsumerAvroRecipes
+    volumes:
+      - ./consumer-recipes.properties:/app/consumer-recipes.properties

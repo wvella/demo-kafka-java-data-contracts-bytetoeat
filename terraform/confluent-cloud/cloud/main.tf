@@ -103,22 +103,40 @@ resource "confluent_role_binding" "app-consumer-schema-registry-api-key-develope
   crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/subject=*"
 }
 
-resource "confluent_role_binding" "app-producer-schema-registry-api-key-developer-read-kek" {
+resource "confluent_role_binding" "app-producer-schema-registry-api-key-developer-read-kek-shared" {
   principal   = "User:${confluent_service_account.app-producer.id}"
   role_name   = "DeveloperRead"
   crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
 }
 
+resource "confluent_role_binding" "app-producer-schema-registry-api-key-developer-read-kek" {
+  principal   = "User:${confluent_service_account.app-producer.id}"
+  role_name   = "DeveloperRead"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
+}
+
 resource "confluent_role_binding" "app-producer-schema-registry-api-key-developer-write-kek" {
   principal   = "User:${confluent_service_account.app-producer.id}"
   role_name   = "DeveloperWrite"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
+}
+
+resource "confluent_role_binding" "app-producer-schema-registry-api-key-developer-write-kek-shared" {
+  principal   = "User:${confluent_service_account.app-producer.id}"
+  role_name   = "DeveloperWrite"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
+}
+
+resource "confluent_role_binding" "app-consumer-schema-registry-api-key-developer-read-kek-shared" {
+  principal   = "User:${confluent_service_account.app-consumer.id}"
+  role_name   = "DeveloperRead"
   crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
 }
 
 resource "confluent_role_binding" "app-consumer-schema-registry-api-key-developer-read-kek" {
   principal   = "User:${confluent_service_account.app-consumer.id}"
   role_name   = "DeveloperRead"
-  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
 }
 
 resource "confluent_api_key" "app-consumer-schema-registry-api-key" {
@@ -334,7 +352,7 @@ resource "confluent_role_binding" "app-consumer-developer-recipes-read-from-grou
   // The existing value of crn_pattern's suffix (group=confluent_cli_consumer_*) are set up to match Confluent CLI's default consumer group ID ("confluent_cli_consumer_<uuid>").
   // https://docs.confluent.io/confluent-cli/current/command-reference/kafka/topic/confluent_kafka_topic_consume.html
   // Update it to match your target consumer group ID.
-  crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/group=confluent_cli_consumer_*"
+  crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/group=java-recipes-consumer-*"
 }
 resource "confluent_role_binding" "app-consumer-developer-orders-read-from-topic" {
   principal   = "User:${confluent_service_account.app-consumer.id}"
@@ -348,5 +366,5 @@ resource "confluent_role_binding" "app-consumer-developer-orders-read-from-group
   // The existing value of crn_pattern's suffix (group=confluent_cli_consumer_*) are set up to match Confluent CLI's default consumer group ID ("confluent_cli_consumer_<uuid>").
   // https://docs.confluent.io/confluent-cli/current/command-reference/kafka/topic/confluent_kafka_topic_consume.html
   // Update it to match your target consumer group ID.
-  crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/group=java-orders-consumer_*"
+  crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/group=java-orders-consumer-*"
 }

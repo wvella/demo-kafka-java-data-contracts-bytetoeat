@@ -1,0 +1,6 @@
+services:
+  producer:
+    image: byte-to-eat-docker-producer-orders:1.0.0
+    container_name: producer-orders
+    volumes:
+      - ./producer-orders.properties:/app/producer-orders.properties

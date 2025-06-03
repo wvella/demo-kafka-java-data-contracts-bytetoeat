@@ -104,19 +104,14 @@ fi
 
 echo "Terraform apply completed successfully."
 
-# Create a recipe
-echo "Running recipe creation..."
-cd ../../../byte-to-eat-v1/
-RECIPE_SCRIPT="run-producer-recipe.sh"
+# Run microservices
+echo "Running microservices ..."
+cd ../main
+RECIPE_SCRIPT="0-build.sh"
 
 if [ -f "$RECIPE_SCRIPT" ]; then
-  echo "Running run-producer-recipe.sh to create the first recipe..."
-  bash "$RECIPE_SCRIPT"
-  if [ $? -ne 0 ]; then
-    echo "Error: run-producer-recipe.sh failed. Aborting Terraform apply."
-    exit 1
-  fi
+  ./"$RECIPE_SCRIPT"
 else
-  echo "Error: run-producer-recipe.sh not found at $RECIPE_SCRIPT. Aborting."
+  echo "Error: $RECIPE_SCRIPT not found."
   exit 1
 fi

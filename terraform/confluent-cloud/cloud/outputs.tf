@@ -1,10 +1,24 @@
-output "resource-ids" {
-  value = <<-EOT
-  Environment ID:   ${confluent_environment.bytetoeat.id}
-  Kafka Cluster Bootstrap Endpoint: ${confluent_kafka_cluster.standard.bootstrap_endpoint}
-  Schema Registry REST Endpoint: ${data.confluent_schema_registry_cluster.advanced.rest_endpoint}
-  EOT
-
+output "unique-id" {
+  value     = var.unique-id
+}
+output "azure-tenant-id" {
+  value     = var.tenant-id
+}
+output "azure-java-producer-client-id" {
+  value     = var.demo-data-contracts-bytetoeat-java-producer-client-id
+  sensitive = true
+}
+output "azure-java-producer-client-secret" {
+  value     = var.demo-data-contracts-bytetoeat-java-producer-client-secret
+  sensitive = true
+}
+output "azure-java-consumer-client-id" {
+  value     = var.demo-data-contracts-bytetoeat-java-producer-client-id
+  sensitive = true
+}
+output "azure-java-consumer-client-secret" {
+  value     = var.demo-data-contracts-bytetoeat-java-producer-client-secret
+  sensitive = true
 }
 output "kafka-url" {
   value     = confluent_kafka_cluster.standard.bootstrap_endpoint

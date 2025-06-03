@@ -1,0 +1,8 @@
+services:
+  producer:
+    image: byte-to-eat-docker-producer-recipes:2.0.0
+    container_name: producer-recipes-v2
+    volumes:
+      - ./producer-recipes.properties:/app/producer-recipes.properties
+    environment:
+      - LIST_ALL_INGREDIENTS=true
