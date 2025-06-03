@@ -42,7 +42,6 @@ See the `demo-recording-480p.mp4` file in the directory
 
 
 1. **Clone the Repo**
-   [`git clone https://github.com/wvella/demo-kafka-java-data-contracts-bytetoeat`](https://github.com/wvella/demo-kafka-java-data-contracts-bytetoeat.git)
 
 2. **Setup Variabes via Terraform**
    1. Create a `terraform.tfvars` in the `terraform/confluent-cloud` directory with the following contents:
@@ -144,28 +143,6 @@ Before running this demo, make sure you have the following installed and configu
 - **AWS** (Coming Soon!), **Azure**, or **GCP** (Coming Soon!) account (choose one)
 - Credentials and access configured for Terraform
 - Cloud CLI
----
-
-## 📦 Applications & Services in This Demo
-
-- **Producer Recipes v1**
-  Docker image: `byte-to-eat-docker-producer-recipes`
-- **Consumer Recipes v1**
-  Docker image: `byte-to-eat-docker-consumer-recipes`
-- **Producer Recipes v2**
-  Docker image: `byte-to-eat-docker-producer-recipes:2.0.0`
-- **Consumer Recipes v2**
-  Docker image: `byte-to-eat-docker-consumer-recipes:2.0.0`
-- **Producer Orders**
-  Docker image: `byte-to-eat-docker-producer-orders`
-- **Consumer Orders**
-  Docker image: `byte-to-eat-docker-consumer-orders`
-- **Confluent Cloud**
-  Kafka, Schema Registry, and Stream Governance (managed via Terraform)
-- **Flink**
-  For joining Recipe and Order events (optional, demo only)
-- **Helper Scripts**
-  Located in `helper-scripts/` for configuration, registration, and deployment
 
 ---
 
