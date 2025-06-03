@@ -3,6 +3,11 @@ make build SERVICE=byte-to-eat-v1-docker-producer-recipes IMAGE_NAME=byte-to-eat
 make up SERVICE=byte-to-eat-v1-docker-producer-recipes
 # make logs SERVICE=byte-to-eat-v1-docker-producer-recipes
 
+# Consumer Recipes v1
+make build SERVICE=byte-to-eat-v1-docker-consumer-recipes IMAGE_NAME=byte-to-eat-docker-consumer-recipes
+make up SERVICE=byte-to-eat-v1-docker-consumer-recipes
+make logs SERVICE=byte-to-eat-v1-docker-consumer-recipes
+
 # Producer Recipes v2
 make build SERVICE=byte-to-eat-v2-docker-producer-recipes IMAGE_NAME=byte-to-eat-docker-producer-recipes IMAGE_TAG=2.0.0
 # ./helper-scripts/register-migration-rules.sh
