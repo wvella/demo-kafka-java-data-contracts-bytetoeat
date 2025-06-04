@@ -20,8 +20,7 @@ This project demonstrates **4 key capabilities of Data Contracts**:
 - **Schema Registry**: Ensures proper validation and schema management for the recipes and orders.
 
 #### Demo Architecture
-![demo-architecture](demo.png)
-#TODO: Update image!
+![demo-architecture](byte-to-eat-demo-architecture.png)
 
 #### Demo Recording
 See the `demo-recording-480p.mp4` file in the directory
