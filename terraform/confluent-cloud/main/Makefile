@@ -30,8 +30,10 @@ docker-push:
 docker-inspect:
 	docker inspect $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG) --format='{{.Architecture}}'
 
+#The - before the command ignores errors if the container is not running.
 up:
 	./helper-scripts/generate-$(SERVICE)-config.sh
+	-docker compose -f $(DOCKER_DIR)/docker-compose.yml rm -sf
 	docker compose -f $(DOCKER_DIR)/docker-compose.yml up -d
 
 logs:
