@@ -12,7 +12,7 @@
 
     <artifactId>java-datacontracts-producer-orders</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <organization>
         <name>Confluent, Inc.</name>

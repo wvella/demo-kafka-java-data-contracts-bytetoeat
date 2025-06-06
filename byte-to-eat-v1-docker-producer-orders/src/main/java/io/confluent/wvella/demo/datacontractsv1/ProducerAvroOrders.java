@@ -54,8 +54,8 @@ public class ProducerAvroOrders {
         produceOrders(producer, topic);
         producer.flush();
         System.out.printf("Messages were produced to topic %s%n", topic);
-        System.out.println("Sleeping for 60 seconds before next execution...");
-        sleepForSeconds(60);
+        System.out.println("Sleeping for 20 seconds before next execution...");
+        sleepForSeconds(20);
         producer.close();
       }
     }
