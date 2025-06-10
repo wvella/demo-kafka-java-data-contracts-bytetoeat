@@ -17,9 +17,7 @@ data "external" "add-azure-role-assignment" {
   program = ["${path.module}/../main/helper-scripts/add-azure-role-assignment.sh","${var.unique-id}"]
   depends_on = [
     azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault,
-    azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault-shared,
-    azurerm_key_vault_key.demo-data-contracts-bytetoeat-csfle-key,
-    azurerm_key_vault_key.demo-data-contracts-bytetoeat-csfle-key-shared
+    azurerm_key_vault.demo-data-contracts-bytetoeat-keyvault-shared
   ]
 }
 
@@ -117,6 +115,7 @@ resource "azurerm_key_vault_key" "demo-data-contracts-bytetoeat-csfle-key-shared
     "verify",
     "wrapKey",
   ]
+  depends_on = [ data.external.add-azure-role-assignment ]
 }
 
 # Create an Azure Key
@@ -134,6 +133,7 @@ resource "azurerm_key_vault_key" "demo-data-contracts-bytetoeat-csfle-key" {
     "verify",
     "wrapKey",
   ]
+  depends_on = [ data.external.add-azure-role-assignment ]
 }
 
 resource "confluent_schema_registry_kek" "cc-kek-shared" {
