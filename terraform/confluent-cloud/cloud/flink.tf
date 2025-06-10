@@ -130,6 +130,7 @@ resource "confluent_flink_statement" "enrich-orders" {
   properties = {
     "sql.current-catalog"  = confluent_environment.bytetoeat.display_name
     "sql.current-database" = confluent_kafka_cluster.standard.display_name
+    "sql.state-ttl" = "86400000" # 1 day in milliseconds
   }
   rest_endpoint = data.confluent_flink_region.flink-region.rest_endpoint
   credentials {
