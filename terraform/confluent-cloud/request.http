@@ -11,5 +11,5 @@ GET {{sr-url}}/dek-registry/v1/keks/{{kek-name}}/deks/raw.recipes-value HTTP/1.1
 Authorization: Basic {{sr-api-key}}:{{sr-api-secret}}
 
 ### Get DEK-Shared
-GET {{sr-url}}/dek-registry/v1/keks/{{kek-name-shared}}-v2/deks/raw.orders-value HTTP/1.1
+GET {{sr-url}}/dek-registry/v1/keks/{{kek-name-shared}}/deks/raw.orders-value HTTP/1.1
 Authorization: Basic {{sr-api-key}}:{{sr-api-secret}}
