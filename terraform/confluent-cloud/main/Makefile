@@ -36,6 +36,9 @@ up:
 	-docker compose -f $(DOCKER_DIR)/docker-compose.yml rm -sf
 	docker compose -f $(DOCKER_DIR)/docker-compose.yml up -d
 
+down:
+	-docker compose -f $(DOCKER_DIR)/docker-compose.yml rm -sf
+
 logs:
 	docker compose -f $(DOCKER_DIR)/docker-compose.yml logs -f | $(highlight_logs)
 

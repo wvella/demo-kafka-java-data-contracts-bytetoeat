@@ -139,6 +139,18 @@ resource "confluent_role_binding" "app-consumer-schema-registry-api-key-develope
   crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
 }
 
+resource "confluent_role_binding" "env-manager-resource-owner-kek" {
+  principal   = "User:${confluent_service_account.env-manager.id}"
+  role_name   = "ResourceOwner"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek.name}"
+}
+
+resource "confluent_role_binding" "env-manager-resource-owner-kek-shared" {
+  principal   = "User:${confluent_service_account.env-manager.id}"
+  role_name   = "ResourceOwner"
+  crn_pattern = "${data.confluent_schema_registry_cluster.advanced.resource_name}/kek=${confluent_schema_registry_kek.cc-kek-shared.name}"
+}
+
 resource "confluent_api_key" "app-consumer-schema-registry-api-key" {
   display_name = "app-consumer-schema-registry-api-key-${var.unique-id}"
   description  = "Schema Registry API Key that is owned by 'app-consumer' service account"
