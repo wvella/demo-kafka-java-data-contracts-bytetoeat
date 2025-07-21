@@ -20,7 +20,3 @@ use.latest.version=false
 acks=all
 use.schema.id=
 auto.register.schemas=false
-
-rule.executors._default_.param.tenant.id=
-rule.executors._default_.param.client.id=
-rule.executors._default_.param.client.secret=

@@ -20,7 +20,3 @@ use.latest.version=true
 auto.register.schemas=false
 #use.schema.id=
 use.latest.with.metadata=application.major.version=2
-
-rule.executors._default_.param.tenant.id=
-rule.executors._default_.param.client.id=
-rule.executors._default_.param.client.secret=
