@@ -134,11 +134,6 @@ Before running this demo, make sure you have the following installed and configu
 ### 🌍 Terraform
 - [Terraform CLI](https://developer.hashicorp.com/terraform/downloads) (v1.0+ recommended)
 
-### 🐍 Python 3
-- Python 3.x (for virtual environments and helper scripts)
-- `venv` module (usually included with Python 3)
-- [pip](https://pip.pypa.io/en/stable/installation/)
-
 ### 🧰 jq
 - [jq](https://stedolan.github.io/jq/) for JSON manipulation in shell scripts
 
@@ -156,5 +151,5 @@ Before running this demo, make sure you have the following installed and configu
 > Most dependencies can be installed via [Homebrew](https://brew.sh/) on macOS:
 > ```
 > brew install --cask docker
-> brew install openjdk maven terraform jq make python
+> brew install openjdk maven terraform jq make
 > ```
