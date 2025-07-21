@@ -4,7 +4,6 @@ TERRAFORM_DIR="../tf-working/" # Update this to the directory containing your Te
 DELETE_SUBJECT_SCRIPT="./helper-scripts/delete-subject.sh" # Path to the delete-subject.sh script
 DELETE_AZURE_SCRIPT="../main/helper-scripts/delete-azure-apps.sh" # Path to the delete-azure-apps.sh script
 DOWN_SCRIPT="./0-down.sh"
-TFVARS_FILE="../tf-working/azure-terraform-secret.auto.tfvars"
 
 CLOUD="$1"
 REGION="$2"
@@ -13,6 +12,8 @@ if [[ "$CLOUD" != "aws" && "$CLOUD" != "azure" && "$CLOUD" != "gcp" ]]; then
   echo "Usage: $0 [aws|azure|gcp] <region>"
   exit 1
 fi
+
+TFVARS_FILE="../tf-working/$CLOUD-terraform-secret.auto.tfvars"
 
 if [[ -z "$REGION" ]]; then
   echo "Usage: $0 [aws|azure|gcp] <region>"
@@ -83,17 +84,19 @@ rm -f *.tf *.tfvars
 echo "Cleaning up the statements..."
 rm -rf statements
 
-# Call delete-azure-apps.sh to delete the azure resource groups and apps
-if [ -f "$DELETE_AZURE_SCRIPT" ]; then
-  echo "Running delete-azure-apps.sh to delete the subject..."
-  bash "$DELETE_AZURE_SCRIPT" "$UNIQUE_ID"
-  if [ $? -ne 0 ]; then
-    echo "Error: delete-azure-apps.sh failed. Aborting Terraform destroy."
+if [[ "$CLOUD" == "azure" ]]; then
+  # Call delete-azure-apps.sh to delete the azure resource groups and apps
+  if [ -f "$DELETE_AZURE_SCRIPT" ]; then
+    echo "Running delete-azure-apps.sh to delete the subject..."
+    bash "$DELETE_AZURE_SCRIPT" "$UNIQUE_ID"
+    if [ $? -ne 0 ]; then
+      echo "Error: delete-azure-apps.sh failed. Aborting Terraform destroy."
+      exit 1
+    fi
+  else
+    echo "Error: delete-azure-apps.sh not found at $DELETE_AZURE_SCRIPT. Aborting."
     exit 1
   fi
-else
-  echo "Error: delete-azure-apps.sh not found at $DELETE_AZURE_SCRIPT. Aborting."
-  exit 1
 fi
 
 # Delete the my-tf-venv directory

@@ -51,7 +51,7 @@ See the `demo-recording-480p.mp4` file in the directory
       ```
 
       Note: For AWS, you need to set the following environment variables:
-      ```
+      ``` env
       export AWS_ACCESS_KEY_ID="anaccesskey"
       export AWS_SECRET_ACCESS_KEY="asecretkey"
       ```
@@ -146,9 +146,9 @@ Before running this demo, make sure you have the following installed and configu
 - [Make](https://www.gnu.org/software/make/) for running Makefile targets
 
 ### ☁️ Cloud Provider Account
-- **AWS** (Coming Soon!), **Azure**, or **GCP** (Coming Soon!) account (choose one)
+- **AWS**, **Azure**, or **GCP** (Coming Soon!) account (choose one)
 - Credentials and access configured for Terraform
-- Cloud CLI
+- Cloud CLI (if deploying into Azure)
 
 ---
 
