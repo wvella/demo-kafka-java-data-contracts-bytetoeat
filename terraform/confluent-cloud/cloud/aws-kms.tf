@@ -1,12 +1,16 @@
 data "aws_caller_identity" "current" {}
 
-data "external" "get-kek-policy" {
-  program = ["python3", "${path.module}/../main/helper-scripts/get-kek-policy-aws.py"]
-  query = {
-    sr_url  = data.confluent_schema_registry_cluster.advanced.rest_endpoint
-    api_key = confluent_api_key.env-manager-schema-registry-api-key.id
-    api_secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+data "http" "get-kek-policy" {
+  url = "${data.confluent_schema_registry_cluster.advanced.rest_endpoint}/dek-registry/v1/policy"
+
+  request_headers = {
+    Authorization = "Basic ${base64encode("${confluent_api_key.env-manager-schema-registry-api-key.id}:${confluent_api_key.env-manager-schema-registry-api-key.secret}")}"
+    Accept        = "application/json"
   }
+}
+
+locals {
+  kek_policy = jsondecode(jsondecode(data.http.get-kek-policy.response_body)["policy"])
 }
 
 resource "aws_iam_user" "data-contracts-bytetoeat-java-producer" {
@@ -38,16 +42,16 @@ resource "aws_kms_key" "demo-data-contracts-bytetoeat-csfle-key-shared" {
     Version = "2012-10-17"
     Id      = "key-default-shared-${var.unique-id}}"
     Statement = concat([
-      {
-        "Sid": "Enable IAM User Permissions",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        },
-        "Action": "kms:*",
-        "Resource": "*"
-      }
-    ], [jsondecode(data.external.get-kek-policy.result["policy"])])
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    }
+  ], [local.kek_policy])
   })
 }
 

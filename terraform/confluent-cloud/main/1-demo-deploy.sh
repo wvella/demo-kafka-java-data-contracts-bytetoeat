@@ -36,23 +36,8 @@ for f in ../cloud/*$CLOUD*; do
   fi
 done
 mv "../tf-working/$CLOUD-outputs.tf" "../tf-working/outputs.tf"
-
 echo "Applying Terraform to $CLOUD."
-
 cd ../tf-working || { echo "Error: Could not change to tf-working directory."; exit 1; }
-# Set up Python virtual environment
-if [ -d "my-tf-venv" ]; then
-  echo "Virtual environment 'my-tf-venv' already exists."
-else
-  python3 -m venv my-tf-venv
-  if [ -d "my-tf-venv" ]; then
-    source my-tf-venv/bin/activate
-    pip install -r ../main/helper-scripts/requirements.txt
-    echo "Virtual environment 'my-tf-venv' created and 'requests' installed."
-  else
-    echo "Failed to create virtual environment 'my-tf-venv'."
-  fi
-fi
 
 # Initialize Terraform
 echo "Initializing Terraform..."

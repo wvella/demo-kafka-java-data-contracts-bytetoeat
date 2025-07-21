@@ -98,7 +98,3 @@ if [[ "$CLOUD" == "azure" ]]; then
     exit 1
   fi
 fi
-
-# Delete the my-tf-venv directory
-echo "Deleting my-tf-venv directory..."
-rm -rf my-tf-venv
