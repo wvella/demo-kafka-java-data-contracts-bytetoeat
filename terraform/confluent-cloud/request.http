@@ -2,7 +2,7 @@
 GET {{sr-url}}/dek-registry/v1/keks HTTP/1.1
 Authorization: Basic {{sr-api-key}}:{{sr-api-secret}}
 
-### Get DEK Policy
+### Get KEK Policy
 GET {{sr-url}}/dek-registry/v1/policy HTTP/1.1
 Authorization: Basic {{sr-api-key}}:{{sr-api-secret}}
 
