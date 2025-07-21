@@ -1,6 +1,9 @@
 output "unique-id" {
   value     = var.unique-id
 }
+output "cloud" {
+  value     = var.cloud
+}
 output "azure-tenant-id" {
   value     = var.tenant-id
 }
