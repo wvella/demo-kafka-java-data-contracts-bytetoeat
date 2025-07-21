@@ -50,11 +50,18 @@ See the `demo-recording-480p.mp4` file in the directory
       confluent_cloud_api_secret = "<<confluent_cloud_api_secret_for_terraform>>"
       ```
 
-3. **Deploy the Demo**
+      Note: For AWS, you need to set the following environment variables:
+      ```
+      export AWS_ACCESS_KEY_ID="anaccesskey"
+      export AWS_SECRET_ACCESS_KEY="asecretkey"
+      ```
+
+
+1. **Deploy the Demo**
    1. `cd terraform/confluent-cloud/main`
    2. Run `./1-demo-deploy.sh [cloud] [region]`. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
 
-4. **Flow**
+2. **Flow**
    1. **PrePreparation**
       1. Open VSCode
       2. Ensure Docker is running
