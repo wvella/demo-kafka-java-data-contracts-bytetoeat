@@ -56,14 +56,6 @@ if [ -f "$TERRAFORM_DIR/terraform.tfvars" ]; then
   echo "Using variable file: terraform.tfvars"
 fi
 
-for cloud in aws azure gcp; do
-  if [ -f "$TERRAFORM_DIR/terraform-$cloud.tfvars" ]; then
-    VAR_FILES+=("-var-file=terraform-$cloud.tfvars")
-    echo "Using variable file: terraform-$cloud.tfvars"
-    break
-  fi
-done
-
 # Only one cloud can be selected; run cloud-specific prerequisites if needed
 if [[ "$CLOUD" == "azure" ]]; then
   echo "🔵 Azure selected: running create-azure-apps.sh for region $REGION..."
