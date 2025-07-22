@@ -36,32 +36,39 @@ See the `demo-recording-480p.mp4` file in the directory
 
 
 
-### 🚀 Demo Flow
+### 🚀 Demo Deployment
 
 
 
 1. **Clone the Repo**
 
-2. **Setup Variabes via Terraform**
-   1. Create a `terraform.tfvars` in the `terraform/confluent-cloud` directory with the following contents:
+2. **Setup Variabes for Terraform**
+   1. Create a `terraform.tfvars` in the `terraform/confluent-cloud/cloud` directory with the following contents:
 
       ``` env
       confluent_cloud_api_key = "<<confluent_cloud_api_key_for_terraform>>"
       confluent_cloud_api_secret = "<<confluent_cloud_api_secret_for_terraform>>"
       ```
 
-      Note: For AWS, you need to set the following environment variables:
+      Note: For **AWS**, you need to set the following environment variables:
       ``` env
       export AWS_ACCESS_KEY_ID="anaccesskey"
       export AWS_SECRET_ACCESS_KEY="asecretkey"
       ```
 
+       Note: For **Azure**, you need to first login via the Azure CLI:
+      ``` env
+      az login
+      ```
 
-1. **Deploy the Demo**
+
+3. **Deploy the Demo**
    1. `cd terraform/confluent-cloud/main`
    2. Run `./1-demo-deploy.sh [cloud] [region]`. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
+4. **Demo Cleanup**
+   1. Run `./demo-destroy.sh [cloud] [region]`.
 
-2. **Flow**
+### Optional Demo Flow Steps
    1. **PrePreparation**
       1. Open VSCode
       2. Ensure Docker is running
@@ -111,8 +118,7 @@ See the `demo-recording-480p.mp4` file in the directory
       9. Start up the V1 consumer is Window 2 `make logs SERVICE=byte-to-eat-v1-docker-consumer-recipes`. Observer the V1 and V2 consumer view of the data.
       10. Start up the V2 producer in Window 3 `make logs SERVICE=byte-to-eat-v2-docker-producer-recipes`.
       11. Start up the V2 consumer is Window 4 `make logs SERVICE=byte-to-eat-v2-docker-consumer-recipes`. Observer the V1 and V2 consumer view of the data.
-   6. **Demo Cleanup**
-       1. Run `./demo-destroy.sh [cloud] [region]`.
+
 
 ### General Notes
 
@@ -141,7 +147,7 @@ Before running this demo, make sure you have the following installed and configu
 - [Make](https://www.gnu.org/software/make/) for running Makefile targets
 
 ### ☁️ Cloud Provider Account
-- **AWS**, **Azure**, or **GCP** (Coming Soon!) account (choose one)
+- **AWS**, **Azure**, or **GCP** (Coming Soon!) account (choose only one)
 - Credentials and access configured for Terraform
 - Cloud CLI (if deploying into Azure)
 
