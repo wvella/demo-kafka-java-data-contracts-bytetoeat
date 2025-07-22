@@ -1,6 +1,6 @@
 services:
   consumer:
-    image: wvella/byte-to-eat-docker-consumer-recipes:2.0.0
+    image: wvella/byte-to-eat-docker-consumer-recipes:2.1.0
     container_name: consumer-recipes-v2
     volumes:
       - ./consumer-recipes.properties:/app/consumer-recipes.properties

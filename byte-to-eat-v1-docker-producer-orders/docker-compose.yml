@@ -1,6 +1,6 @@
 services:
   producer:
-    image: wvella/byte-to-eat-docker-producer-orders:1.0.1
+    image: wvella/byte-to-eat-docker-producer-orders:1.1.0
     container_name: producer-orders
     volumes:
       - ./producer-orders.properties:/app/producer-orders.properties

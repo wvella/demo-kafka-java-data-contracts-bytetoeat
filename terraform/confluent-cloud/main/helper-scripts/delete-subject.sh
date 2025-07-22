@@ -5,8 +5,8 @@ SR_URL=$(terraform -chdir="$TERRAFORM_DIR" output -raw schema-registry-url)
 SR_API_KEY=$(terraform -chdir="$TERRAFORM_DIR" output -raw env-manager-schema-registry-api-key)
 SR_API_SECRET=$(terraform -chdir="$TERRAFORM_DIR" output -raw env-manager-schema-registry-api-secret)
 
-# Read the unique-id value from azure-terraform-secret.auto.tfvars
-UNIQUE_ID=$(grep '^unique-id' ../tf-working/azure-terraform-secret.auto.tfvars | awk -F'=' '{gsub(/"/, "", $2); print $2}' | xargs)
+# Read the unique-id value from [aws|azure|gcp]-terraform-secret.auto.tfvars
+UNIQUE_ID=$(grep '^unique-id' ../tf-working/*-terraform-secret.auto.tfvars | awk -F'=' '{gsub(/"/, "", $2); print $2}' | xargs)
 
 # This is required because we create a new version of the Schema in the same Subject outside of Terraform, using the REST API.
 SUBJECTS=("raw.recipes-value" "raw.orders-value" "enriched_orders-value") # Add more subjects as needed

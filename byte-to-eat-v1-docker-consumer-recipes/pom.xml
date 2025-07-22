@@ -12,7 +12,7 @@
 
     <artifactId>java-datacontracts-consumer-recipes</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <organization>
         <name>Confluent, Inc.</name>
@@ -113,6 +113,11 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client-encryption-azure</artifactId>
+            <version>${io.confluent.schema-registry.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-schema-registry-client-encryption-aws</artifactId>
             <version>${io.confluent.schema-registry.version}</version>
         </dependency>
         <dependency>

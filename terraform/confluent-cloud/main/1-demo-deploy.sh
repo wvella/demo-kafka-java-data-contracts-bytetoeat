@@ -17,7 +17,7 @@ if [[ -z "$REGION" ]]; then
 fi
 
 # Remove cloud-specific files from the current directory (not subdirectories)
-find ../tf-working/ -maxdepth 1 -type f \( -name "*aws*" -o -name "*azure*" -o -name "*gcp*" \) ! -name "azure-terraform-secret.auto.tfvars" -exec rm -f {} +
+find ../tf-working/ -maxdepth 1 -type f \( -name "*aws*" -o -name "*azure*" -o -name "*gcp*" \) ! -name "$CLOUD-terraform-secret.auto.tfvars" -exec rm -f {} +
 
 # Copy common files (files that do NOT contain any cloud name)
 for f in ../cloud/*; do
@@ -35,23 +35,9 @@ for f in ../cloud/*$CLOUD*; do
     cp "$f" ../tf-working/
   fi
 done
-
+mv "../tf-working/$CLOUD-outputs.tf" "../tf-working/outputs.tf"
 echo "Applying Terraform to $CLOUD."
-
 cd ../tf-working || { echo "Error: Could not change to tf-working directory."; exit 1; }
-# Set up Python virtual environment
-if [ -d "my-tf-venv" ]; then
-  echo "Virtual environment 'my-tf-venv' already exists."
-else
-  python3 -m venv my-tf-venv
-  if [ -d "my-tf-venv" ]; then
-    source my-tf-venv/bin/activate
-    pip install -r ../main/helper-scripts/requirements.txt
-    echo "Virtual environment 'my-tf-venv' created and 'requests' installed."
-  else
-    echo "Failed to create virtual environment 'my-tf-venv'."
-  fi
-fi
 
 # Initialize Terraform
 echo "Initializing Terraform..."
@@ -87,8 +73,12 @@ if [[ "$CLOUD" == "azure" ]]; then
     exit 1
   fi
 elif [[ "$CLOUD" == "aws" ]]; then
-  echo "🟢 AWS selected: (placeholder) run your AWS prerequisites script here..."
-  # ./create-aws-resources.sh
+  echo "🟢 AWS selected: running create-aws-apps.sh for region $REGION..."
+  ../main/helper-scripts/create-aws-apps.sh "$REGION"
+  if [ $? -ne 0 ]; then
+    echo "Error: create-aws-apps.sh failed."
+    exit 1
+  fi
 elif [[ "$CLOUD" == "gcp" ]]; then
   echo "🟡 GCP selected: (placeholder) run your GCP prerequisites script here..."
   # ./create-gcp-resources.sh

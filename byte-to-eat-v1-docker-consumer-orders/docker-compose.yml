@@ -1,6 +1,6 @@
 services:
   consumer:
-    image: wvella/byte-to-eat-docker-consumer-orders:1.0.0
+    image: wvella/byte-to-eat-docker-consumer-orders:1.1.0
     container_name: consumer-orders
     volumes:
       - ./consumer-orders.properties:/app/consumer-orders.properties

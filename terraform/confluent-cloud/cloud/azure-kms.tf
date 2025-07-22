@@ -4,13 +4,21 @@ data "azuread_service_principal" "current" {
   client_id = var.demo-data-contracts-bytetoeat-tf-client-id
 }
 
-data "external" "get-kek-policy" {
-  program = ["python3", "${path.module}/../main/helper-scripts/get-kek-policy.py"]
-  query = {
-    sr_url  = data.confluent_schema_registry_cluster.advanced.rest_endpoint
-    api_key = confluent_api_key.env-manager-schema-registry-api-key.id
-    api_secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+data "http" "get-kek-policy" {
+  url = "${data.confluent_schema_registry_cluster.advanced.rest_endpoint}/dek-registry/v1/policy"
+
+  request_headers = {
+    Authorization = "Basic ${base64encode("${confluent_api_key.env-manager-schema-registry-api-key.id}:${confluent_api_key.env-manager-schema-registry-api-key.secret}")}"
+    Accept        = "application/json"
   }
+}
+
+locals {
+ # Extract issuer value using regexall
+  matches = regexall("--issuer\\s+([^\\s\\\\]+)", data.http.get-kek-policy.response_body)
+
+  # Get the first capture group from the first match, or empty string if no match
+  issuer = length(local.matches) > 0 ? local.matches[0][0] : ""
 }
 
 data "external" "add-azure-role-assignment" {
@@ -29,10 +37,6 @@ locals {
   rest_endpoint = data.confluent_schema_registry_cluster.advanced.rest_endpoint
   # Extract the subdomain before the first dot after https://
   schema_registry_id = regex("^https://([^.]+)\\.", local.rest_endpoint)[0]
-}
-
-output "policy_issuer" {
-  value = data.external.get-kek-policy.result["issuer"]
 }
 
 resource "azurerm_user_assigned_identity" "demo-data-contracts-bytetoeat-cc-identity" {
@@ -71,7 +75,7 @@ resource "azurerm_federated_identity_credential" "demo-data-contracts-bytetoeat-
   name                 = "${var.unique-id}-fc"
   resource_group_name  = data.azurerm_resource_group.resource-group.name
   audience             = ["api://AzureADTokenExchange"]
-  issuer               = data.external.get-kek-policy.result["issuer"]
+  issuer               = local.issuer
   subject              = "system:serviceaccount:${local.schema_registry_id}:default"
   parent_id            = azurerm_user_assigned_identity.demo-data-contracts-bytetoeat-cc-identity.id
 }

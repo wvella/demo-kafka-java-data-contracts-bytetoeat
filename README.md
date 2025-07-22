@@ -50,11 +50,18 @@ See the `demo-recording-480p.mp4` file in the directory
       confluent_cloud_api_secret = "<<confluent_cloud_api_secret_for_terraform>>"
       ```
 
-3. **Deploy the Demo**
+      Note: For AWS, you need to set the following environment variables:
+      ``` env
+      export AWS_ACCESS_KEY_ID="anaccesskey"
+      export AWS_SECRET_ACCESS_KEY="asecretkey"
+      ```
+
+
+1. **Deploy the Demo**
    1. `cd terraform/confluent-cloud/main`
    2. Run `./1-demo-deploy.sh [cloud] [region]`. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
 
-4. **Flow**
+2. **Flow**
    1. **PrePreparation**
       1. Open VSCode
       2. Ensure Docker is running
@@ -127,11 +134,6 @@ Before running this demo, make sure you have the following installed and configu
 ### 🌍 Terraform
 - [Terraform CLI](https://developer.hashicorp.com/terraform/downloads) (v1.0+ recommended)
 
-### 🐍 Python 3
-- Python 3.x (for virtual environments and helper scripts)
-- `venv` module (usually included with Python 3)
-- [pip](https://pip.pypa.io/en/stable/installation/)
-
 ### 🧰 jq
 - [jq](https://stedolan.github.io/jq/) for JSON manipulation in shell scripts
 
@@ -139,9 +141,9 @@ Before running this demo, make sure you have the following installed and configu
 - [Make](https://www.gnu.org/software/make/) for running Makefile targets
 
 ### ☁️ Cloud Provider Account
-- **AWS** (Coming Soon!), **Azure**, or **GCP** (Coming Soon!) account (choose one)
+- **AWS**, **Azure**, or **GCP** (Coming Soon!) account (choose one)
 - Credentials and access configured for Terraform
-- Cloud CLI
+- Cloud CLI (if deploying into Azure)
 
 ---
 
@@ -149,5 +151,5 @@ Before running this demo, make sure you have the following installed and configu
 > Most dependencies can be installed via [Homebrew](https://brew.sh/) on macOS:
 > ```
 > brew install --cask docker
-> brew install openjdk maven terraform jq make python
+> brew install openjdk maven terraform jq make
 > ```
