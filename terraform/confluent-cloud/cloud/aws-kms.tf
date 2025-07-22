@@ -40,7 +40,7 @@ resource "aws_kms_key" "demo-data-contracts-bytetoeat-csfle-key-shared" {
   deletion_window_in_days = 20
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "key-default-shared-${var.unique-id}}"
+    Id      = "key-default-shared-${var.unique-id}"
     Statement = concat([
     {
       "Sid": "Enable IAM User Permissions",
