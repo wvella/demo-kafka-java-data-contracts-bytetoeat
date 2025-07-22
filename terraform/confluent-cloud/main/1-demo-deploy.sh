@@ -80,9 +80,11 @@ elif [[ "$CLOUD" == "aws" ]]; then
     exit 1
   fi
 elif [[ "$CLOUD" == "gcp" ]]; then
-  echo "🟡 GCP selected: (placeholder) run your GCP prerequisites script here..."
-  # ./create-gcp-resources.sh
+  echo "🟡 GCP selected: running /create-gcp-apps.sh for region $REGION..."
+  ../main/helper-scripts/create-gcp-apps.sh "$REGION"
 fi
+
+read -p "Pausing priot to TF.."
 
 # Run terraform apply
 echo "Running terraform apply..."

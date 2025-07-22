@@ -36,4 +36,11 @@ elif [[ "$CLOUD" == "AWS" ]]; then
   CLIENT_SECRET=$(terraform -chdir="$TERRAFORM_DIR" output -raw aws-java-producer-client-secret)
   echo "rule.executors._default_.param.access.key.id=$CLIENT_ID" >> "$PROPERTIES_FILE"
   echo "rule.executors._default_.param.secret.access.key=$CLIENT_SECRET" >> "$PROPERTIES_FILE"
+
+elif [[ "$CLOUD" == "GCP" ]]; then
+  CLIENT_ID=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp-java-producer-client-id)
+  CLIENT_SECRET=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp-java-producer-client-secret)
+  echo "rule.executors._default_.param.client.id=$CLIENT_ID" >> "$PROPERTIES_FILE"
+  echo "rule.executors._default_.param.private.key=$CLIENT_SECRET" >> "$PROPERTIES_FILE"
+
 fi
