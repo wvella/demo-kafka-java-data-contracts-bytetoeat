@@ -42,7 +42,7 @@ See the `demo-recording-480p.mp4` file in the directory
 
 1. **Clone the Repo**
 
-2. **Setup Variabes for Terraform**
+2. **Setup Variables for Terraform**
    1. Create a `terraform.tfvars` in the `terraform/confluent-cloud/cloud` directory with the following contents:
 
       ``` env
