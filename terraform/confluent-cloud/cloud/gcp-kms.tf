@@ -102,6 +102,13 @@ resource "google_project_iam_member" "project_iam" {
   member  = "serviceAccount:${local.kek_policy}"
 }
 
+# Give access to the Producer Service Account via the custom role
+resource "google_project_iam_member" "producer_iam" {
+  project = var.gcp-project-id
+  role    = google_project_iam_custom_role.demo-data-contracts-bytetoeat-custom-role.id
+  member  = "serviceAccount:${google_service_account.data-contracts-bytetoeat-java-producer.email}"
+}
+
 
 # Allow CC service account to access shared key
 # resource "aws_kms_key" "demo-data-contracts-bytetoeat-csfle-key-shared" {

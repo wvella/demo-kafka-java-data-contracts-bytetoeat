@@ -65,15 +65,30 @@ output "gcp-java-producer-client-id" {
   value     = google_service_account.data-contracts-bytetoeat-java-producer.id
   sensitive = true
 }
+
+output "gcp-java-producer-client-email" {
+  value     = google_service_account.data-contracts-bytetoeat-java-producer.email
+  sensitive = true
+}
+
+
 output "gcp-java-producer-client-secret" {
   value     = google_service_account_key.data-contracts-bytetoeat-java-producer.private_key
   sensitive = true
 }
+
+output "gcp-java-producer-client-secret-id" {
+  value     = google_service_account_key.data-contracts-bytetoeat-java-producer.id
+  sensitive = true
+}
+
 output "gcp-java-consumer-client-id" {
   value     = google_service_account.data-contracts-bytetoeat-java-consumer.id
   sensitive = true
 }
-output "aws-java-consumer-client-secret" {
+output "gcp-java-consumer-client-secret" {
   value     = google_service_account_key.data-contracts-bytetoeat-java-consumer.private_key
   sensitive = true
 }
+
+
