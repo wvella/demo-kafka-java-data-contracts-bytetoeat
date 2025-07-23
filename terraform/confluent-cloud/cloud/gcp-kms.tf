@@ -34,26 +34,7 @@ resource "google_service_account_key" "data-contracts-bytetoeat-java-consumer" {
   service_account_id = google_service_account.data-contracts-bytetoeat-java-consumer.id
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
-# resource "aws_iam_user" "data-contracts-bytetoeat-java-producer" {
-#   name = "demo-data-contracts-bytetoeat-${var.unique-id}-java-producer"
-# }
 
-# resource "aws_iam_access_key" "data-contracts-bytetoeat-java-producer" {
-#   user = aws_iam_user.data-contracts-bytetoeat-java-producer.name
-# }
-
-# resource "aws_iam_user" "data-contracts-bytetoeat-java-consumer" {
-#   name = "demo-data-contracts-bytetoeat-${var.unique-id}-java-consumer"
-# }
-
-# resource "aws_iam_access_key" "data-contracts-bytetoeat-java-consumer" {
-#   user = aws_iam_user.data-contracts-bytetoeat-java-consumer.name
-# }
-
-# resource "aws_kms_alias" "kms-key-alias-demo-data-contracts-bytetoeat-csfle-key-shared" {
-#   name          = "alias/demo-data-contracts-bytetoeat-csfle-key-shared-${var.unique-id}"
-#   target_key_id = aws_kms_key.demo-data-contracts-bytetoeat-csfle-key-shared.key_id
-# }
 
 # Create KMS keyring
 resource "google_kms_key_ring" "demo-data-contracts-bytetoeat-csfle-keyring" {
@@ -110,68 +91,13 @@ resource "google_project_iam_member" "producer_iam" {
 }
 
 
-# Allow CC service account to access shared key
-# resource "aws_kms_key" "demo-data-contracts-bytetoeat-csfle-key-shared" {
-#   description             = "A symmetric encryption KMS key"
-#   enable_key_rotation     = true
-#   deletion_window_in_days = 20
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Id      = "key-default-shared-${var.unique-id}"
-#     Statement = concat([
-#     {
-#       "Sid": "Enable IAM User Permissions",
-#       "Effect": "Allow",
-#       "Principal": {
-#         "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-#       },
-#       "Action": "kms:*",
-#       "Resource": "*"
-#     }
-#   ], [local.kek_policy])
-#   })
-# }
+# Give access to the Consumer Service Account via the custom role
+resource "google_project_iam_member" "consumer_iam" {
+  project = var.gcp-project-id
+  role    = google_project_iam_custom_role.demo-data-contracts-bytetoeat-custom-role.id
+  member  = "serviceAccount:${google_service_account.data-contracts-bytetoeat-java-consumer.email}"
+}
 
-# resource "aws_kms_alias" "kms-key-alias-demo-data-contracts-bytetoeat-csfle-key" {
-#   name          = "alias/demo-data-contracts-bytetoeat-csfle-key-${var.unique-id}"
-#   target_key_id = aws_kms_key.demo-data-contracts-bytetoeat-csfle-key.key_id
-# }
-
-# resource "aws_kms_key" "demo-data-contracts-bytetoeat-csfle-key" {
-#   description             = "A symmetric encryption KMS key"
-#   enable_key_rotation     = true
-#   deletion_window_in_days = 20
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Id      = "key-default-${var.unique-id}"
-#     Statement = [
-#     {
-#       "Sid": "Enable IAM User Permissions",
-#       "Effect": "Allow",
-#       "Principal": {
-#         "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-#       },
-#       "Action": "kms:*",
-#       "Resource": "*"
-#     },
-#     {
-#         "Sid": "Allow Producer and Consumer Encrypt/Decrypt",
-#         "Effect": "Allow",
-#         "Principal": {
-#           "AWS": [
-#             aws_iam_user.data-contracts-bytetoeat-java-producer.arn,
-#             aws_iam_user.data-contracts-bytetoeat-java-consumer.arn
-#           ]
-#         },
-#         "Action": [
-#           "kms:Encrypt",
-#           "kms:Decrypt"
-#         ],
-#         "Resource": "*"
-#       }
-#     ]
-#   })
-# }
 
 # Add shared key to Schema Registry
 resource "confluent_schema_registry_kek" "cc-kek-shared" {

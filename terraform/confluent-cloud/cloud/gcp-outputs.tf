@@ -71,7 +71,6 @@ output "gcp-java-producer-client-email" {
   sensitive = true
 }
 
-
 output "gcp-java-producer-client-secret" {
   value     = google_service_account_key.data-contracts-bytetoeat-java-producer.private_key
   sensitive = true
@@ -91,4 +90,12 @@ output "gcp-java-consumer-client-secret" {
   sensitive = true
 }
 
+output "gcp-java-consumer-client-email" {
+  value     = google_service_account.data-contracts-bytetoeat-java-consumer.email
+  sensitive = true
+}
 
+output "gcp-java-consumer-client-secret-id" {
+  value     = google_service_account_key.data-contracts-bytetoeat-java-consumer.id
+  sensitive = true
+}

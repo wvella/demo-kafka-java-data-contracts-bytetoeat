@@ -68,3 +68,5 @@ replay_pid*
 # My custom ignore rules
 *.properties
 my-tf-venv
+.DS_Store
+.vscode/settings.json
