@@ -84,8 +84,6 @@ elif [[ "$CLOUD" == "gcp" ]]; then
   ../main/helper-scripts/create-gcp-apps.sh "$REGION" "$GCP_PROJECT_ID"
 fi
 
-read -p "Pausing priot to TF.."
-
 # Run terraform apply
 echo "Running terraform apply..."
 terraform -chdir="$TERRAFORM_DIR" apply "${VAR_FILES[@]}" -auto-approve

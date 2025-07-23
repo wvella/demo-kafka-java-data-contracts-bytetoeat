@@ -4,7 +4,7 @@ variable "cloud" {
 }
 
 variable "region" {
-  description = "The GCP region to deploy resources into (e.g., ap-southeast-2)"
+  description = "The GCP region to deploy resources into (e.g., australia-southeast1)"
   type        = string
 }
 
@@ -15,6 +15,6 @@ variable "unique-id" {
 
 
 variable "gcp-project-id" {
-  description = "The GCP project-id to deploy resources into"
+  description = "The GCP project-id to deploy resources into (e.g. my-project)"
   type        = string
 }

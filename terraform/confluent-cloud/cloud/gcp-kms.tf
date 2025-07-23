@@ -15,7 +15,7 @@ locals {
 # Create Producer service account & key
 resource "google_service_account" "data-contracts-bytetoeat-java-producer" {
   account_id   = "producer-${var.unique-id}"
-  display_name = "demo-data-contracts producer"
+  display_name = "demo-data-contracts-bytetoeat producer"
 }
 
 resource "google_service_account_key" "data-contracts-bytetoeat-java-producer" {
@@ -27,7 +27,7 @@ resource "google_service_account_key" "data-contracts-bytetoeat-java-producer" {
 # Creates Consumer service account & key
 resource "google_service_account" "data-contracts-bytetoeat-java-consumer" {
   account_id   = "consumer-${var.unique-id}"
-  display_name = "demo-data-contracts consumer"
+  display_name = "demo-data-contracts-bytetoeat consumer"
 }
 
 resource "google_service_account_key" "data-contracts-bytetoeat-java-consumer" {
@@ -69,7 +69,7 @@ resource "google_kms_crypto_key" "demo-data-contracts-bytetoeat-csfle-key-shared
 # Create GCP custom role
 resource "google_project_iam_custom_role" "demo-data-contracts-bytetoeat-custom-role" {
   role_id     = "customrole${var.unique-id}"
-  title       = "demo-data-contracts-custom-role-${var.unique-id}"
+  title       = "demo-data-contracts-bytetoeat-custom-role-${var.unique-id}"
   description = "Custom role for Confluent Cloud CSFLE key access"
   permissions = ["cloudkms.cryptoKeyVersions.useToDecrypt","cloudkms.cryptoKeyVersions.useToEncrypt"]
 }
@@ -77,7 +77,7 @@ resource "google_project_iam_custom_role" "demo-data-contracts-bytetoeat-custom-
 
 
 # Give access to the Confluent Service Account via the custom role
-resource "google_project_iam_member" "project_iam" {
+resource "google_project_iam_member" "cc_project_iam" {
   project = var.gcp-project-id
   role    = google_project_iam_custom_role.demo-data-contracts-bytetoeat-custom-role.id
   member  = "serviceAccount:${local.kek_policy}"
