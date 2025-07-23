@@ -4,7 +4,7 @@
 # Check if a region was provided as an argument
 if [[ $# -lt 2 || -z "$1" || -z "$2"  ]]; then
   echo "❌ gcp region and project-id not specified."
-  echo "Usage: $0 <gcp-region> gcp-project-id"
+  echo "Usage: $0 <gcp-region> <gcp-project-id>"
   exit 1
 fi
 GCP_REGION="$1"
