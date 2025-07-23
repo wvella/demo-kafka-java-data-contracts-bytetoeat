@@ -1,10 +1,10 @@
 #!/bin/bash
-# Usage: ./create-gcp-apps.sh <gcp-region>
+# Usage: ./create-gcp-apps.sh <gcp-region> <gcp-project-id>
 
 # Check if a region was provided as an argument
-if [[ $# -lt 1 || -z "$1" ]]; then
-  echo "❌ gcp region not specified."
-  echo "Usage: $0 <gcp-region>"
+if [[ $# -lt 2 || -z "$1" || -z "$2"  ]]; then
+  echo "❌ gcp region and project-id not specified."
+  echo "Usage: $0 <gcp-region> gcp-project-id"
   exit 1
 fi
 GCP_REGION="$1"
