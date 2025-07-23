@@ -8,6 +8,7 @@ if [[ $# -lt 1 || -z "$1" ]]; then
   exit 1
 fi
 GCP_REGION="$1"
+GCP_PROJECT_ID="$2"
 
 TFVARS_FILE="gcp-terraform.auto.tfvars"
 TFVARS_SECRET_FILE="gcp-terraform-secret.auto.tfvars"
@@ -23,5 +24,6 @@ fi
 
 echo "cloud = \"GCP\"" >> "$TFVARS_FILE"
 echo "region = \"$GCP_REGION\"" >> "$TFVARS_FILE"
+echo "gcp-project-id = \"$GCP_PROJECT_ID\"" >> "$TFVARS_FILE"
 
 echo "✅ Done. Outputs written to $TFVARS_FILE"
