@@ -15,7 +15,7 @@ locals {
 # Create Producer service account & key
 resource "google_service_account" "data-contracts-bytetoeat-java-producer" {
   account_id   = "producer-${var.unique-id}"
-  display_name = "demo-data-contracts-bytetoeat producer"
+  display_name = "demo-data-contracts-bytetoeat-producer"
 }
 
 resource "google_service_account_key" "data-contracts-bytetoeat-java-producer" {
@@ -27,7 +27,7 @@ resource "google_service_account_key" "data-contracts-bytetoeat-java-producer" {
 # Creates Consumer service account & key
 resource "google_service_account" "data-contracts-bytetoeat-java-consumer" {
   account_id   = "consumer-${var.unique-id}"
-  display_name = "demo-data-contracts-bytetoeat consumer"
+  display_name = "demo-data-contracts-bytetoeat-consumer"
 }
 
 resource "google_service_account_key" "data-contracts-bytetoeat-java-consumer" {
