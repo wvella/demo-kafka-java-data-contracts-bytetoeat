@@ -34,4 +34,16 @@ elif [[ "$CLOUD" == "AWS" ]]; then
   CLIENT_SECRET=$(terraform -chdir="$TERRAFORM_DIR" output -raw aws-java-consumer-client-secret)
   echo "rule.executors._default_.param.access.key.id=$CLIENT_ID" >> "$PROPERTIES_FILE"
   echo "rule.executors._default_.param.secret.access.key=$CLIENT_SECRET" >> "$PROPERTIES_FILE"
+
+elif [[ "$CLOUD" == "GCP" ]]; then
+  CLIENT_EMAIL=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp-java-consumer-client-email)
+  CLIENT_SECRET_ID=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp-java-consumer-client-secret-id)
+  CLIENT_ID=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp-java-consumer-client-id)
+  CLIENT_SECRET_ENCODED=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp-java-consumer-client-secret)
+  CLIENT_SECRET=$(echo $CLIENT_SECRET_ENCODED | base64 --decode | jq .private_key | tr -d '"')
+  echo "rule.executors._default_.param.client.email=$CLIENT_EMAIL" >> "$PROPERTIES_FILE"
+  echo "rule.executors._default_.param.private.key.id=$CLIENT_SECRET_ID" >> "$PROPERTIES_FILE"
+  echo "rule.executors._default_.param.client.id=$CLIENT_ID" >> "$PROPERTIES_FILE"
+  echo "rule.executors._default_.param.private.key=$CLIENT_SECRET" >> "$PROPERTIES_FILE"
+
 fi

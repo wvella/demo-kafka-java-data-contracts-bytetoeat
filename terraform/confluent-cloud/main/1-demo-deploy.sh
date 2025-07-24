@@ -4,15 +4,23 @@ TERRAFORM_DIR="." # Update this to the directory containing your Terraform confi
 
 CLOUD="$1"
 REGION="$2"
+GCP_PROJECT_ID="$3"
 
 if [[ "$CLOUD" != "aws" && "$CLOUD" != "azure" && "$CLOUD" != "gcp" ]]; then
-  echo "Usage: $0 [aws|azure|gcp] <region>"
+  echo "Usage: $0 [aws|azure|gcp] <region> [<gcp-project-id>]"
   exit 1
 fi
 
 if [[ -z "$REGION" ]]; then
-  echo "Usage: $0 [aws|azure|gcp] <region>"
+  echo "Usage: $0 [aws|azure|gcp] <region> [<gcp-project-id>]"
   echo "Error: Region must be specified as the second argument."
+  exit 1
+fi
+
+# GCP also requires a project-id.
+if [[ -z "$GCP_PROJECT_ID" && "$CLOUD" = "gcp" ]]; then
+  echo "Usage: $0 [gcp] <region> <gcp-project-id>"
+  echo "Error: GCP project-id must be specified as the third argument."
   exit 1
 fi
 
@@ -72,8 +80,8 @@ elif [[ "$CLOUD" == "aws" ]]; then
     exit 1
   fi
 elif [[ "$CLOUD" == "gcp" ]]; then
-  echo "🟡 GCP selected: (placeholder) run your GCP prerequisites script here..."
-  # ./create-gcp-resources.sh
+  echo "🟡 GCP selected: running /create-gcp-apps.sh for region $REGION & project $GCP_PROJECT_ID..."
+  ../main/helper-scripts/create-gcp-apps.sh "$REGION" "$GCP_PROJECT_ID"
 fi
 
 # Run terraform apply

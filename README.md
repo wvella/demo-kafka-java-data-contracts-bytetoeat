@@ -14,7 +14,7 @@ This project demonstrates **4 key capabilities of Data Contracts**:
 
 ### 🍲 How It Works
 
-- **Recipe Producer**: Sends recipe details, including ingredients, steps, and chef info to the Kafka topic in Confluent Cloud.
+- **Recipe Producer**: Sends recipe details, including ingredients, steps, and chef info to the Kafka topic in Confluent Cloud. 
 - **Order Producer**: Simulates customer orders referencing recipes by their `recipe_id`.
 - **Kafka Consumers**: Consume orders and recipes, validating and transforming the data based on Avro schemas.
 - **Schema Registry**: Ensures proper validation and schema management for the recipes and orders.
@@ -61,12 +61,18 @@ See the `demo-recording-480p.mp4` file in the directory
       az login
       ```
 
+      Note: For **GCP**, you need to first login via the GCP CLI:
+      ``` env
+      gcloud auth application-default login
+      ```
+      GCP also requires a project-id, provided on the command-line (see below).
 
 3. **Deploy the Demo**
    1. `cd terraform/confluent-cloud/main`
-   2. Run `./1-demo-deploy.sh [cloud] [region]`. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
+   2. Run `./1-demo-deploy.sh [cloud] [region] [gcp-project-id]`. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
+   
 4. **Demo Cleanup**
-   1. Run `./demo-destroy.sh [cloud] [region]`.
+   1. Run `./demo-destroy.sh [cloud] [region] [gcp-project-id]`
 
 ### Optional Demo Flow Steps
    1. **PrePreparation**
@@ -147,9 +153,9 @@ Before running this demo, make sure you have the following installed and configu
 - [Make](https://www.gnu.org/software/make/) for running Makefile targets
 
 ### ☁️ Cloud Provider Account
-- **AWS**, **Azure**, or **GCP** (Coming Soon!) account (choose only one)
+- **AWS**, **Azure**, or **GCP** account (choose only one)
 - Credentials and access configured for Terraform
-- Cloud CLI (if deploying into Azure)
+- Cloud CLI (if deploying into Azure or GCP)
 
 ---
 
