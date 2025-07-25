@@ -14,44 +14,49 @@ This project demonstrates **4 key capabilities of Data Contracts**:
 
 ### 🍲 How It Works
 
-Client Applications:
+#### Client Applications:
 
-- **Recipe Producer**: Sends recipe details, including ingredients, steps, and chef info to the Kafka topic in Confluent Cloud. 
-   * Runs once and completes.
-   * In this demo, we switch from v1 to v2 of the recipe schema.
-- **Order Producer**: Simulates customer orders referencing recipes by their `recipe_id`. 
-   * Runs continuously and produces a batch of orders every twenty seconds.
-- **Kafka Consumers**: Consume orders and recipes, validating and transforming the data based on Avro schemas. 
-   * Run continuously
-   * There are three consumer applications:
-      * v1 Recipe Consumer
-      * v2 Recipe Consumer
-      * Order Consumer
+- **Order Producer**: Simulates customer orders referencing recipes by their `recipe_id`, produces to `raw.orders`.
+- **Order Consumer**: Consumes orders from `raw.orders`
+- **Recipe Producer**: Sends a single recipe, including ingredients, steps, and chef info to the Kafka topic `raw.recipes` in Confluent Cloud, then terminates.
+- **Recipe Consumer**: Consume recipes from `raw.recipes`
 
-Managed Components:
+This demo demonstrates how Schema Migration can help clients handle a breaking change, by changing the schema in the **Recipe Producer/Consumer** with a new version of the application.
+
+#### Managed Components:
 
 - **Kafka Cluster**: Confluent Cloud cluster, through which all data flows.
 - **Schema Registry**: Ensures proper validation and schema management for the recipes and orders, and stores various rules.
 - **Flink**: Consumes `raw.orders` and enriches them with the latest recipe from `raw.recipes`, and produces the result to `enriched_orders` topic.
 
-#### Demo flow
+#### Demo Overview
 
-1. Set up infrastructure, start these client applications (and Flink job, etc.)
-   * v1 Recipe Producer
+Prior to running the demo, set up the infrastructure for the demo and start these client applications (and Flink job, etc.):
    * Order Producer
-   * v1 Recipe Consumer
    * Order Consumer
-1. Demonstrate data flow through various topics (and Flink)
-1. Demonstrate data quality rule ('require more than one ingredient' on `recipes.raw` topic), and show result of producing invalid recipe
-1. Demonstrate data transformation rule ('transform recipe name' on both `orders.raw` and `recipes.raw` topics, which replaces spaces with dashes and adds a prefix)
-1. Demonstrate data encryption rule (customer information in `orders.raw` topic and downstream `enriched_orders` topic), and show how adding a tag to an existing data contract (schema) encrypts the field in all new messages.
-1. Demonstrate Schema migration rule (join/split chef name) and show how different versions of the recipe producer/consumer handle this by starting the following:
-   * v2 Recipe Producer
-   * v2 Recipe Consumer
+   * Recipe Producer (v1)
+   * Recipe Consumer (v1)
+
+The demo follows these high-level steps:
+
+1. **Explanation**: Provide an overview of data flow through the provisioned infrastructure
+1. **Data Quality Rules**: Show how a data quality rule can prevent semantically incorrect data from landing in Kafka topic.
+   * The `raw.recipes` topic has a rule that must include multiple ingredents; invalid recipes will end up in a dead letter queue (`raw.recipes.dlq`)
+1. **Data Transformation Rules**:  Show how a data transformation rule can modify data before it lands in a Kafka topic.
+   * Both the `raw.orders` and `raw.recipes` topics have a data transformation rule that does three things to the `recipe_id` field:
+      * Replace spaces with dashes
+      * Converts to lower case
+      * Prefixes the recipe with `id-recipe`
+1. **Data Encryption Rule**: Shows how Client-Side Field Level Encryption (CSFLE) can be used to encrypt fields tagged with specific properties
+   * The `raw.orders` topic has a rule that encrypts the fields tagged as `PII`
+   * Each order initially has two fields tagged as `PII`: `customer_address` and `ccn` (Credit Card Number)
+   * In the demo, we add a `PII` tag to an existing field (`customer_name`) and show how new messages are automatically encrypted.
+1. **Schema Migration Rules**: Shows how a rule can handle breaking schema changes
+   * In Version 1 of the Recipes producer and consumer, we have field `chef_name`; this field is split into `chef_first_name` and `chef_last_name` in Version 2 of the applications.
+   * v1 and v2 of both the Recipe Producer and Recipe Consumer are able to handle both versions of the data, where the schema migration rule automatically updates the field on the fly.
 
 #### Demo Architecture
 ![demo-architecture](byte-to-eat-demo-architecture.png)
-
 
 #### Demo Recording
 See the `demo-recording-480p.mp4` file in the directory
@@ -72,13 +77,14 @@ See the `demo-recording-480p.mp4` file in the directory
 2. **Setup Variables for Terraform**
    1. Create a `terraform.tfvars` in the `terraform/confluent-cloud/cloud` directory with the following contents:
 
-      ``` env
+      ```shell
       confluent_cloud_api_key = "<<confluent_cloud_api_key_for_terraform>>"
       confluent_cloud_api_secret = "<<confluent_cloud_api_secret_for_terraform>>"
       ```
 
       Note: For **AWS**, you need to set the following environment variables:
-      ``` env
+
+      ```shell
       export AWS_ACCESS_KEY_ID="anaccesskey"
       export AWS_SECRET_ACCESS_KEY="asecretkey"
       # If using ephemeral credentials, also need a token
@@ -86,34 +92,37 @@ See the `demo-recording-480p.mp4` file in the directory
       ```
 
        Note: For **Azure**, you need to first login via the Azure CLI:
-      ``` env
+      
+      ```shell
       az login
       ```
 
       Note: For **GCP**, you need to first login via the GCP CLI:
-      ``` env
+
+      ```shell
       gcloud auth application-default login
       ```
+
       GCP also requires a project-id, provided on the command-line (see below).
 
 3. **Deploy the Demo**
 
    1. Change to the main directory
    
-         ```
+         ```shell
          cd terraform/confluent-cloud/main
          ```
 
    2. Run the demo. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
       * AWS or Azure
          
-         ```
+         ```shell
          ./1-demo-deploy.sh [cloud] [region]
          ```
 
       * GCP (provide a project ID)
       
-         ```
+         ```shell
          ./1-demo-deploy.sh [cloud] [region] [gcp-project-id]
          ```
    
@@ -121,13 +130,13 @@ See the `demo-recording-480p.mp4` file in the directory
 
    * AWS or Azure
    
-      ```
+      ```shell
       ./demo-destroy.sh [cloud] [region]
       ```
 
    * GCP
 
-      ```
+      ```shell
       ./demo-destroy.sh [cloud] [region] [gcp-project-id]
       ```
 
@@ -136,22 +145,23 @@ See the `demo-recording-480p.mp4` file in the directory
    1. **Prep**
       1. Ensure Docker is running
       1. Open VS Code in the root of the cloned git repo (these commands can be run in the VS Code built-in terminal)
+
          1. Open `ProducerAvroRecipes.java`
 
-            ```
+            ```shell
             code ./byte-to-eat-v1-docker-producer-recipes/src/main/java/io/confluent/wvella/demo/datacontractsv1/ProducerAvroRecipes.java
-            code ./byte-to-eat-v1-docker-producer-recipes/src/main/java/io/confluent/wvella/demo/datacontractsv2/ProducerAvroRecipes.java
             ```
 
          1. Open `data-governance.tf`
 
-            ```
+            ```shell
             code ./terraform/confluent-cloud/cloud/data-governance.tf
             ```
 
-         1. Open `schema-raw.recipe-value-v2.avsc` (in `byte-to-eat-v2-docker-consumer-recipes/src/main/resources/avro/`)
+         1. Open `schema-raw.recipe-value-v1.avsc` and `schema-raw.recipe-value-v2.avsc` (in `byte-to-eat-v2-docker-consumer-recipes/src/main/resources/avro/`)
 
-            ```
+            ```shell
+            code ./byte-to-eat-v1-docker-producer-recipes/src/main/resources/avro/schema-raw.recipe-value.avsc
             code ./byte-to-eat-v2-docker-producer-recipes/src/main/resources/avro/schema-raw.recipe-value-v2.avsc
             ```
 
@@ -162,41 +172,93 @@ See the `demo-recording-480p.mp4` file in the directory
          1. Window 3: V1 Consumer (White Background)
          1. Window 4: V2 Consumer (Black Background)
    2. **Data Quality Rules**
-      1. Show `require_more_than_one_ingredient` rule definition in Terraform `data-governance.tf` / Confluent Cloud UI.
-      2. Demonstrate by trying to produce a recipe that violates the rule by running:
-         2. Set `LIST_ALL_INGREDIENTS=false` in `byte-to-eat-v1-docker-producer-recipes/docker-compose.yml`.
-         3. `make up SERVICE=byte-to-eat-v1-docker-producer-recipes` in the `terraform/confluent-cloud/main` directory.
-      3. Show the bad message ending up in the `raw.recipes.dlq` topic.
-      4. Set `LIST_ALL_INGREDIENTS=true` in `byte-to-eat-v1-docker-consumer-recipes/docker-compose.yml`.
+      1. Show `require_more_than_one_ingredient` rule definition in Terraform `data-governance.tf` or in the Confluent Cloud UI (on `raw.recipes`)
+      1. Demonstrate by trying to produce a recipe that violates the rule by running:
+         1. Edit `./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml` with:
+
+            ```yaml
+                  - LIST_ALL_INGREDIENTS=true
+            ```
+
+         1. Run this in the in the `terraform/confluent-cloud/main` directory:
+
+            ```shell
+            make up SERVICE=byte-to-eat-v1-docker-producer-recipes
+            ```
+
+      1. Show the bad message ending up in the `raw.recipes.dlq` topic.
+      1. Undo the change to `./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml`, and re-deploy:
+
+            ```shell
+            make up SERVICE=byte-to-eat-v1-docker-producer-recipes
+            ```
+   
    3. **Data Transformation Rules**
-      1. Show `transform_recipe_name_to_valid_recipe_id` rule definition in Terraform `data-governance.tf` / Confluent Cloud UI.
-      2. Show the recipe id in the Java Code `ProducerAvroRecipes.java` in the `byte-to-eat-v1-docker-producer-recipes` directory.
-      3. Show how the recipe ID is transformed when it's written to the `raw.recipe` topic via the Data Transformation rule.
+      1. Show `transform_recipe_name_to_valid_recipe_id` rule definition in Terraform `data-governance.tf` or in the Confluent Cloud UI (on `raw.recipes`).
+      1. Show the recipe id in the Java Code `ProducerAvroRecipes.java` in the `byte-to-eat-v1-docker-producer-recipes` directory.
+      1. Show how the recipe ID is transformed when it's written to the `raw.recipe` topic via the Data Transformation rule.
+
    4. **Data Encryption Rules**
       1. Key Shared with Confluent
-          1. Show the `Orders` Data Contract in the Confluent Cloud UI. Orders have some PII tags.
-          2. Show the `ProducerAvroRecipes.java` application. There is no Code to do the encryption, it just imports the `kafka-schema-rules` dependency.
-          3. Show `encrypt_pii` rule definition in the Confluent Cloud UI.
-          4. Show the Key Encryption Keys definition under `Stream Governance` -> `Schema Registry` -> `Encryption Keys`.
-          5. Show the `raw.orders` topic to see the `customer_address` and `pii` field encrypted.
-          6. In the Confluent Cloud UI, add another `pii` tag to `customer_name` show the schema is instant. No code changes.
-          7. Show the `raw.orders` Topic in the Confluent Cloud UI to show the `customer_name` field is now encrypted.
-          8. **Bonus:** The consumer can only decrypt the field because it has access to the Key Encryption Key. Remove the access via the Confluent Cloud UI and the field won't be decrypted.
-          9. **Bonus:** Flink is joining the `Orders` and `Recipes` together, and the encrypted field will be carried through.
-      2. Key Not Shared with Confluent
+          1. Show the `raw.orders` Data Contract in the Confluent Cloud UI. Orders have some PII tags.
+          1. Show the `ProducerAvroRecipes.java` application. There is no Code to do the encryption, it just imports the `kafka-schema-rules` dependency.
+          1. Show `encrypt_pii` rule definition in the Confluent Cloud UI.
+          1. Show the Key Encryption Keys definition under `Stream Governance` -> `Schema Registry` -> `Encryption Keys`.
+          1. Show the `raw.orders` topic to see the `customer_address` and `pii` field encrypted.
+          1. In the Confluent Cloud UI, add another `pii` tag to `customer_name` show the schema is instant. No code changes.
+          1. Show the `raw.orders` Topic in the Confluent Cloud UI to show the `customer_name` field is now encrypted.
+          1. **Bonus:** The consumer can only decrypt the field because it has access to the Key Encryption Key. Remove the access via the Confluent Cloud UI and the field won't be decrypted.
+          1. **Bonus:** Flink is joining the `Orders` and `Recipes` together, and the encrypted field will be carried through.
+      1. Key Not Shared with Confluent
          1. Same as *Key Shared with Confluent* above, except you need credentials configured in the applications in order to access the KMS.
-   5. **Schema Migration Rules**
+
+   1. **Schema Migration Rules**
       1. In the Confluent Cloud UI, show the current version of the `raw.recipe-value` Data Contract which has `application.major.version` set to 1.
-      2. Show `schema-raw.recipe-value-v2.avsc` which now has the `chef_first_name` and `chef_last_name` as seperate fields. This would be a breaking change.
-      3. Run `helper-scripts/register-migration-rules.sh` to register the new Data Contract and Migration Rules. Show `migration_rules.json`.
-      4. Start the V2 producer `make up SERVICE=byte-to-eat-v2-docker-producer-recipes`
-      5. Start the V2 consumer `make up SERVICE=byte-to-eat-v2-docker-consumer-recipes`
-      6. Show the new `raw.recipe-value` Data Contract in the Confluent Cloud UI. `application.major.version` is now set to 2.
-      7. Show the `split_chef_first_and_last_name` and `join_chef_first_and_last_name` migration rules in the Confluent Cloud UI.
-      8. Start up the V1 producer in Window 1 `make logs SERVICE=byte-to-eat-v1-docker-producer-recipes`.
-      9. Start up the V1 consumer is Window 2 `make logs SERVICE=byte-to-eat-v1-docker-consumer-recipes`. Observer the V1 and V2 consumer view of the data.
-      10. Start up the V2 producer in Window 3 `make logs SERVICE=byte-to-eat-v2-docker-producer-recipes`.
-      11. Start up the V2 consumer is Window 4 `make logs SERVICE=byte-to-eat-v2-docker-consumer-recipes`. Observer the V1 and V2 consumer view of the data.
+      1. Compare v1 and v2 of the recipe schema (`schema-raw.recipe-value.avsc` and `schema-raw.recipe-value-v2.avsc`)
+         * In version 1, see the field `chef_name`
+         * In version 2, see the fields `chef_first_name` and `chef_last_name`
+         * This would normally be considered a breaking change.
+      1. Run `helper-scripts/register-migration-rules.sh` to register the new Data Contract and Migration Rules. Show `migration_rules.json`.
+      1. Start the V2 producer
+
+         ```shell
+         make up SERVICE=byte-to-eat-v2-docker-producer-recipes
+         ```
+
+      1. Start the V2 consumer 
+      
+         ```shell
+         make up SERVICE=byte-to-eat-v2-docker-consumer-recipes
+         ```
+
+      1. Show the new `raw.recipe-value` Data Contract in the Confluent Cloud UI. Notice that `application.major.version` is now set to 2.
+      1. Show the `split_chef_first_and_last_name` and `join_chef_first_and_last_name` migration rules in the Confluent Cloud UI.
+      1. Look at logs for the four recipe applications:
+         1. Start up the V1 producer in Window 1:
+
+               ```shell
+               make logs SERVICE=byte-to-eat-v1-docker-producer-recipes
+               ```
+
+         1. Start up the V1 consumer is Window 2.
+
+               ```shell
+               make logs SERVICE=byte-to-eat-v1-docker-consumer-recipes
+               ```
+
+         1. Start up the V2 producer in Window 3
+
+            ```shell
+            make logs SERVICE=byte-to-eat-v2-docker-producer-recipes
+            ```
+
+         1. Start up the V2 consumer is Window 4
+
+            ```shell
+            make logs SERVICE=byte-to-eat-v2-docker-consumer-recipes`
+            ```
+
+         1. Compare the output data for the different versions of the application
 
 
 ### General Notes
