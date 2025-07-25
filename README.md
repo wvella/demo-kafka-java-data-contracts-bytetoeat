@@ -204,7 +204,7 @@ See the `demo-recording-480p.mp4` file in the directory
    4. **Data Encryption Rules**
       1. Key Shared with Confluent
           1. Show the `raw.orders` Data Contract in the Confluent Cloud UI. Orders have some PII tags.
-          1. Show the `ProducerAvroRecipes.java` application. There is no Code to do the encryption, it just imports the `kafka-schema-rules` dependency.
+          1. Show the `ProducerAvroRecipes.java` application. There are no code changes required to enable encryption; just import the relevant packages following the Confluent documentation.
           1. Show `encrypt_pii` rule definition in the Confluent Cloud UI.
           1. Show the Key Encryption Keys definition under `Stream Governance` -> `Schema Registry` -> `Encryption Keys`.
           1. Show the `raw.orders` topic to see the `customer_address` and `pii` field encrypted.
