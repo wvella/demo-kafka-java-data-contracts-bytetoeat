@@ -1,6 +1,6 @@
 services:
   producer:
-    image: wvella/byte-to-eat-docker-producer-recipes:1.2.0
+    image: wvella/byte-to-eat-docker-producer-recipes:2.0.0
     container_name: producer-recipes
     volumes:
       - ./producer-recipes.properties:/app/producer-recipes.properties
