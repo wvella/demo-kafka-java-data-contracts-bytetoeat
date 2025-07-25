@@ -20,13 +20,13 @@ Client Applications:
    * Runs once and completes.
    * In this demo, we switch from v1 to v2 of the recipe schema.
 - **Order Producer**: Simulates customer orders referencing recipes by their `recipe_id`. 
-   * Runs continously and produces a batch of orders every twenty seconds.
+   * Runs continuously and produces a batch of orders every twenty seconds.
 - **Kafka Consumers**: Consume orders and recipes, validating and transforming the data based on Avro schemas. 
-   * Run continously
+   * Run continuously
    * There are three consumer applications:
       * v1 Recipe Consumer
       * v2 Recipe Consumer
-      * Order Cconsumer
+      * Order Consumer
 
 Managed Components:
 
@@ -122,13 +122,13 @@ See the `demo-recording-480p.mp4` file in the directory
    * AWS or Azure
    
       ```
-      ./demo-destroy.sh [cloud] [region] [gcp-project-id]
+      ./demo-destroy.sh [cloud] [region]
       ```
 
    * GCP
 
       ```
-      ./demo-destroy.sh [cloud] [region]
+      ./demo-destroy.sh [cloud] [region] [gcp-project-id]
       ```
 
 
