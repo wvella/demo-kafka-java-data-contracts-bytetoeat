@@ -41,7 +41,7 @@ The demo follows these high-level steps:
 
 1. **Explanation**: Provide an overview of data flow through the provisioned infrastructure
 1. **Data Quality Rules**: Show how a data quality rule can prevent semantically incorrect data from landing in Kafka topic.
-   * The `raw.recipes` topic has a rule that must include multiple ingredents; invalid recipes will end up in a dead letter queue (`raw.recipes.dlq`)
+   * The `raw.recipes` topic has a rule that must include multiple ingredients; invalid recipes will end up in a dead letter queue (`raw.recipes.dlq`)
 1. **Data Transformation Rules**:  Show how a data transformation rule can modify data before it lands in a Kafka topic.
    * Both the `raw.orders` and `raw.recipes` topics have a data transformation rule that does three things to the `recipe_id` field:
       * Replace spaces with dashes
@@ -177,7 +177,7 @@ See the `demo-recording-480p.mp4` file in the directory
          1. Edit `./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml` with:
 
             ```yaml
-                  - LIST_ALL_INGREDIENTS=true
+                  - LIST_ALL_INGREDIENTS=false
             ```
 
          1. Run this in the in the `terraform/confluent-cloud/main` directory:
@@ -255,7 +255,7 @@ See the `demo-recording-480p.mp4` file in the directory
          1. Start up the V2 consumer is Window 4
 
             ```shell
-            make logs SERVICE=byte-to-eat-v2-docker-consumer-recipes`
+            make logs SERVICE=byte-to-eat-v2-docker-consumer-recipes
             ```
 
          1. Compare the output data for the different versions of the application
