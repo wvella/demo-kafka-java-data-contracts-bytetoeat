@@ -144,6 +144,7 @@ See the `demo-recording-480p.mp4` file in the directory
 ### Demo Walkthrough
    1. **Prep**
       1. Ensure Docker is running
+
       1. Open VS Code in the root of the cloned git repo (these commands can be run in the VS Code built-in terminal)
 
          1. Open `ProducerAvroRecipes.java`
@@ -166,11 +167,13 @@ See the `demo-recording-480p.mp4` file in the directory
             ```
 
       1. Log into Confluent Cloud
-      1. Open 4 Terminal Windows and `cd demo-kafka-java-data-contracts-bytetoeat`:
+
+      1. Open 4 Terminal Windows to compare the v1 and v2 versions of the Recipe Producer/Consumer:
          1. Window 1: V1 Producer (White Background)
          1. Window 2: V2 Producer (Black Background)
          1. Window 3: V1 Consumer (White Background)
          1. Window 4: V2 Consumer (Black Background)
+
    2. **Data Quality Rules**
       1. Show `require_more_than_one_ingredient` rule definition in Terraform `data-governance.tf` or in the Confluent Cloud UI (on `raw.recipes`)
       1. Demonstrate by trying to produce a recipe that violates the rule by running:
@@ -234,25 +237,25 @@ See the `demo-recording-480p.mp4` file in the directory
       1. Show the new `raw.recipe-value` Data Contract in the Confluent Cloud UI. Notice that `application.major.version` is now set to 2.
       1. Show the `split_chef_first_and_last_name` and `join_chef_first_and_last_name` migration rules in the Confluent Cloud UI.
       1. Look at logs for the four recipe applications:
-         1. Start up the V1 producer in Window 1:
+         1. View logs for the V1 producer in Window 1:
 
                ```shell
                make logs SERVICE=byte-to-eat-v1-docker-producer-recipes
                ```
 
-         1. Start up the V1 consumer is Window 2.
+         1. View logs for the V1 consumer is Window 2.
 
                ```shell
                make logs SERVICE=byte-to-eat-v1-docker-consumer-recipes
                ```
 
-         1. Start up the V2 producer in Window 3
+         1. View logs for the V2 producer in Window 3
 
             ```shell
             make logs SERVICE=byte-to-eat-v2-docker-producer-recipes
             ```
 
-         1. Start up the V2 consumer is Window 4
+         1. View logs for the V2 consumer is Window 4
 
             ```shell
             make logs SERVICE=byte-to-eat-v2-docker-consumer-recipes
