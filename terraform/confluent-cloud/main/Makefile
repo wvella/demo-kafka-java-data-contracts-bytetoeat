@@ -1,5 +1,5 @@
 SEMVER=$(shell cat VERSION)
-DOCKER_USERNAME=wvella
+DOCKER_USERNAME ?= wvella
 
 SERVICE ?= NULL
 IMAGE_NAME ?= $(SERVICE)
@@ -17,6 +17,10 @@ endef
 
 java-build:
 	cd $(JAVA_BUILD_DIR) && mvn clean package
+
+# multi-arch requires a push at the same time
+build-multi-arch: java-build
+	docker buildx build --push --platform linux/amd64,linux/arm64/v8 --tag $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG) -f $(DOCKER_DIR)/Dockerfile $(DOCKER_DIR)
 
 build: java-build
 #For Intel use linux/amd64
