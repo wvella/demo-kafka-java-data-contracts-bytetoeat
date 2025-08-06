@@ -65,7 +65,7 @@
           "Sensitive"
         ],
         "params": {
-          "encrypt.kek.name": "bytetoeat-68q7w1-kek"
+          "encrypt.kek.name": "<< automatically filled out by register-migration-rules.sh >>"
         },
         "onFailure": "ERROR,NONE",
         "disabled": false

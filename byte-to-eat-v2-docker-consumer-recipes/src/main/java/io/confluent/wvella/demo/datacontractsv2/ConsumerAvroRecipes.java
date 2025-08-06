@@ -16,7 +16,7 @@
 
 package io.confluent.wvella.demo.datacontractsv2;
 
-import static io.confluent.wvella.demo.datacontractsv1.Util.loadConfig;
+import static io.confluent.wvella.demo.datacontractsv2.Util.loadConfig;
 
 import java.time.Duration;
 import java.util.Arrays;
