@@ -19,8 +19,10 @@ java-build:
 	cd $(JAVA_BUILD_DIR) && mvn clean package
 
 # multi-arch requires a push at the same time
+# builds once, tags both as ${IMAGE_TAG} and 'latest'
 build-multi-arch: java-build
 	docker buildx build --push --platform linux/amd64,linux/arm64/v8 --tag $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG) -f $(DOCKER_DIR)/Dockerfile $(DOCKER_DIR)
+	docker buildx imagetools create --tag $(DOCKER_USERNAME)/$(IMAGE_NAME):latest $(DOCKER_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 build: java-build
 #For Intel use linux/amd64
