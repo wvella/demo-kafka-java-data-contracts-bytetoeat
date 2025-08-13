@@ -13,7 +13,7 @@ resource "confluent_schema_registry_kek" "cc_kek_shared" {
   name        = "bytetoeat-${local.unique_id}-kek-shared"
   doc         = "GCP Key Encryption Key used for CSFLE encryption"
   kms_type    = "gcp-kms"
-  kms_key_id = google_kms_crypto_key.demo_data_contracts_bytetoeat_csfle_key_shared.id
+  kms_key_id  = google_kms_crypto_key.demo_data_contracts_bytetoeat_csfle_key_shared.id
   shared      = true
   hard_delete = true
 }

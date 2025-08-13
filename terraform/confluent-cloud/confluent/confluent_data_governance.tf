@@ -53,12 +53,12 @@ resource "confluent_schema" "raw_recipes_value" {
     // END Data Transformation Rules
     // START Data Encryption Rules
     domain_rules {
-      name   = "encrypt_sensitive"
-      doc    = "Encrypt all fields which are tagged with sensitive"
-      kind   = "TRANSFORM"
-      type   = "ENCRYPT"
-      mode   = "WRITEREAD"
-      tags   = [confluent_tag.sensitive.name]
+      name = "encrypt_sensitive"
+      doc  = "Encrypt all fields which are tagged with sensitive"
+      kind = "TRANSFORM"
+      type = "ENCRYPT"
+      mode = "WRITEREAD"
+      tags = [confluent_tag.sensitive.name]
       params = {
         "encrypt.kek.name" = confluent_schema_registry_kek.cc_kek.name
       }
@@ -118,12 +118,12 @@ resource "confluent_schema" "raw_orders_value" {
     // END Data Transformation Rules
     // START Data Encryption Rules
     domain_rules {
-      name   = "encrypt_pii"
-      doc    = "Encrypt all fields which are tagged with PII"
-      kind   = "TRANSFORM"
-      type   = "ENCRYPT"
-      mode   = "WRITEREAD"
-      tags   = [confluent_tag.pii.name]
+      name = "encrypt_pii"
+      doc  = "Encrypt all fields which are tagged with PII"
+      kind = "TRANSFORM"
+      type = "ENCRYPT"
+      mode = "WRITEREAD"
+      tags = [confluent_tag.pii.name]
       params = {
         "encrypt.kek.name" = confluent_schema_registry_kek.cc_kek_shared.name
       }

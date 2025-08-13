@@ -40,7 +40,7 @@ resource "google_service_account_key" "data_contracts_bytetoeat_java_consumer" {
 resource "google_kms_key_ring" "demo_data_contracts_bytetoeat_csfle_keyring" {
   name     = "demo-data-contracts-bytetoeat-csfle-keyring-${local.unique_id}"
   location = local.region
-  project =  var.gcp_project_id
+  project  = var.gcp_project_id
 }
 
 # Create a key
@@ -71,7 +71,7 @@ resource "google_project_iam_custom_role" "demo_data_contracts_bytetoeat_custom_
   role_id     = "customrole${local.unique_id}"
   title       = "demo-data-contracts-bytetoeat-custom-role-${local.unique_id}"
   description = "Custom role for Confluent Cloud CSFLE key access"
-  permissions = ["cloudkms.cryptoKeyVersions.useToDecrypt","cloudkms.cryptoKeyVersions.useToEncrypt"]
+  permissions = ["cloudkms.cryptoKeyVersions.useToDecrypt", "cloudkms.cryptoKeyVersions.useToEncrypt"]
 }
 
 

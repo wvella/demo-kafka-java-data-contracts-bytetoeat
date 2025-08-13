@@ -1,4 +1,5 @@
 #!/bin/bash
+# Run from root directory
 # Variables
 SUBJECT="raw.recipes-value"
 DATA_CONTRACT="./helper-scripts/migration_rules.json"

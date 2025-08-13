@@ -1,5 +1,5 @@
 locals {
-  enriched_table_name  = "enriched_orders"
+  enriched_table_name = "enriched_orders"
 }
 
 // Service account to perform a task within Confluent Cloud, such as executing a Flink statement
@@ -50,14 +50,14 @@ resource "confluent_role_binding" "app_manager_flink_developer" {
 // to create and complete transactions.
 // https://docs.confluent.io/cloud/current/flink/operate-and-deploy/flink-rbac.html#authorization
 resource "confluent_role_binding" "app_manager_flink_transaction_id_developer_read" {
-  principal = "User:${confluent_service_account.app_manager_flink.id}"
-  role_name = "DeveloperRead"
+  principal   = "User:${confluent_service_account.app_manager_flink.id}"
+  role_name   = "DeveloperRead"
   crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/transactional-id=_confluent-flink_*"
- }
+}
 
 resource "confluent_role_binding" "app_manager_flink_transaction_id_developer_write" {
-  principal = "User:${confluent_service_account.app_manager_flink.id}"
-  role_name = "DeveloperWrite"
+  principal   = "User:${confluent_service_account.app_manager_flink.id}"
+  role_name   = "DeveloperWrite"
   crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/transactional-id=_confluent-flink_*"
 }
 
@@ -130,7 +130,7 @@ resource "confluent_flink_statement" "enrich_orders" {
   properties = {
     "sql.current-catalog"  = confluent_environment.bytetoeat.display_name
     "sql.current-database" = confluent_kafka_cluster.standard.display_name
-    "sql.state-ttl" = "86400000" # 1 day in milliseconds
+    "sql.state-ttl"        = "86400000" # 1 day in milliseconds
   }
   rest_endpoint = data.confluent_flink_region.flink_region.rest_endpoint
   credentials {
@@ -171,5 +171,4 @@ resource "confluent_flink_statement" "alter_watermark" {
     confluent_kafka_topic.enriched_orders,
     confluent_schema.enriched_orders_value
   ]
-
 }

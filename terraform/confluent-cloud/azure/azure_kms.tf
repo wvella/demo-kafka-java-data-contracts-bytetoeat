@@ -14,7 +14,7 @@ data "http" "get-kek-policy" {
 }
 
 locals {
- # Extract issuer value using regexall
+  # Extract issuer value using regexall
   matches = regexall("--issuer\\s+([^\\s\\\\]+)", data.http.get-kek-policy.response_body)
 
   # Get the first capture group from the first match, or empty string if no match
@@ -23,7 +23,7 @@ locals {
 
 # Todo refactor to use script in tf directory
 data "external" "add-azure-role-assignment" {
-  program = ["${path.module}/../helper-scripts/add-azure-role-assignment.sh","${local.unique_id}"]
+  program = ["${path.module}/../helper-scripts/add-azure-role-assignment.sh", "${local.unique_id}"]
   depends_on = [
     azurerm_key_vault.demo_data_contracts_bytetoeat_keyvault,
     azurerm_key_vault.demo_data_contracts_bytetoeat_keyvault_shared
@@ -47,8 +47,8 @@ resource "azurerm_user_assigned_identity" "demo_data_contracts_bytetoeat_cc_iden
 }
 
 resource "azurerm_role_definition" "demo_data_contracts_bytetoeat_cc_role" {
-  name        = "${local.unique_id}-cc-role"
-  scope       = azurerm_key_vault.demo_data_contracts_bytetoeat_keyvault_shared.id
+  name  = "${local.unique_id}-cc-role"
+  scope = azurerm_key_vault.demo_data_contracts_bytetoeat_keyvault_shared.id
 
   description = "Custom role for Confluent Schema Registry Key Vault Access to read, encrypt, and decrypt"
   permissions {
@@ -63,7 +63,7 @@ resource "azurerm_role_definition" "demo_data_contracts_bytetoeat_cc_role" {
     not_data_actions = []
   }
   assignable_scopes = [azurerm_key_vault.demo_data_contracts_bytetoeat_keyvault_shared.id]
-  depends_on = [ data.external.add-azure-role-assignment ]
+  depends_on        = [data.external.add-azure-role-assignment]
 }
 
 resource "azurerm_role_assignment" "demo_data_contracts_bytetoeat_cc_role_assignment" {
@@ -73,12 +73,12 @@ resource "azurerm_role_assignment" "demo_data_contracts_bytetoeat_cc_role_assign
 }
 
 resource "azurerm_federated_identity_credential" "demo_data_contracts_bytetoeat_fc" {
-  name                 = "${local.unique_id}-fc"
-  resource_group_name  = data.azurerm_resource_group.resource_group.name
-  audience             = ["api://AzureADTokenExchange"]
-  issuer               = local.issuer
-  subject              = "system:serviceaccount:${local.schema_registry_id}:default"
-  parent_id            = azurerm_user_assigned_identity.demo_data_contracts_bytetoeat_cc_identity.id
+  name                = "${local.unique_id}-fc"
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = local.issuer
+  subject             = "system:serviceaccount:${local.schema_registry_id}:default"
+  parent_id           = azurerm_user_assigned_identity.demo_data_contracts_bytetoeat_cc_identity.id
 }
 
 resource "azurerm_key_vault" "demo_data_contracts_bytetoeat_keyvault_shared" {
@@ -90,7 +90,7 @@ resource "azurerm_key_vault" "demo_data_contracts_bytetoeat_keyvault_shared" {
   soft_delete_retention_days  = 7
   purge_protection_enabled    = true
   enable_rbac_authorization   = true
-  sku_name = "standard"
+  sku_name                    = "standard"
 }
 
 resource "azurerm_key_vault" "demo_data_contracts_bytetoeat_keyvault" {
@@ -102,7 +102,7 @@ resource "azurerm_key_vault" "demo_data_contracts_bytetoeat_keyvault" {
   soft_delete_retention_days  = 7
   purge_protection_enabled    = true
   enable_rbac_authorization   = true
-  sku_name = "standard"
+  sku_name                    = "standard"
 }
 
 # Create an Azure Key
@@ -120,7 +120,7 @@ resource "azurerm_key_vault_key" "demo_data_contracts_bytetoeat_csfle_key_shared
     "verify",
     "wrapKey",
   ]
-  depends_on = [ data.external.add-azure-role-assignment ]
+  depends_on = [data.external.add-azure-role-assignment]
 }
 
 # Create an Azure Key
@@ -138,5 +138,5 @@ resource "azurerm_key_vault_key" "demo_data_contracts_bytetoeat_csfle_key" {
     "verify",
     "wrapKey",
   ]
-  depends_on = [ data.external.add-azure-role-assignment ]
+  depends_on = [data.external.add-azure-role-assignment]
 }

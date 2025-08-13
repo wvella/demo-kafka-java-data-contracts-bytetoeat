@@ -1,5 +1,5 @@
 output "azure_tenant_id" {
-  value     = var.tenant_id
+  value = var.tenant_id
 }
 
 output "azure_java_producer_client_id" {

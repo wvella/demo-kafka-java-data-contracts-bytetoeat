@@ -42,16 +42,16 @@ resource "aws_kms_key" "demo_data_contracts_bytetoeat_csfle_key_shared" {
     Version = "2012-10-17"
     Id      = "key-default-shared-${local.unique_id}"
     Statement = concat([
-    {
-      "Sid": "Enable IAM User Permissions",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-      },
-      "Action": "kms:*",
-      "Resource": "*"
-    }
-  ], [local.kek_policy])
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      }
+    ], [local.kek_policy])
   })
 }
 
@@ -68,29 +68,29 @@ resource "aws_kms_key" "demo_data_contracts_bytetoeat_csfle_key" {
     Version = "2012-10-17"
     Id      = "key-default-${local.unique_id}"
     Statement = [
-    {
-      "Sid": "Enable IAM User Permissions",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
       },
-      "Action": "kms:*",
-      "Resource": "*"
-    },
-    {
-        "Sid": "Allow Producer and Consumer Encrypt/Decrypt",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": [
+      {
+        "Sid" : "Allow Producer and Consumer Encrypt/Decrypt",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [
             aws_iam_user.data_contracts_bytetoeat_java_producer.arn,
             aws_iam_user.data_contracts_bytetoeat_java_consumer.arn
           ]
         },
-        "Action": [
+        "Action" : [
           "kms:Encrypt",
           "kms:Decrypt"
         ],
-        "Resource": "*"
+        "Resource" : "*"
       }
     ]
   })

@@ -361,7 +361,7 @@ resource "confluent_role_binding" "app_consumer_developer_recipes_read_from_grou
   // Update it to match your target consumer group ID.
   crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/group=java-recipes-consumer-*"
 }
-  resource "confluent_role_binding" "app_consumer_developer_orders_read_from_topic" {
+resource "confluent_role_binding" "app_consumer_developer_orders_read_from_topic" {
   principal   = "User:${confluent_service_account.app_consumer.id}"
   role_name   = "DeveloperRead"
   crn_pattern = "${confluent_kafka_cluster.standard.rbac_crn}/kafka=${confluent_kafka_cluster.standard.id}/topic=${confluent_kafka_topic.raw_orders.topic_name}"
