@@ -65,7 +65,7 @@
           "Sensitive"
         ],
         "params": {
-          "encrypt.kek.name": "bytetoeat-df0a42-kek"
+          "encrypt.kek.name": "bytetoeat-PLACEHOLDER-kek"
         },
         "onFailure": "ERROR,NONE",
         "disabled": false
