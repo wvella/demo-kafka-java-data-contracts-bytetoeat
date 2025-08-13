@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.confluent.wvella.demo.datacontractsv1;
+package io.confluent.wvella.demo.datacontractsv2;
 
 import java.io.FileInputStream;
 import java.io.IOException;
