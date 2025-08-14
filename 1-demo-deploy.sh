@@ -8,8 +8,6 @@ TERRAFORM_BASE_DIR="${BASE_DIR}/terraform/confluent-cloud" # Update this to the 
 TERRAFORM_WORKING_DIR="${BASE_DIR}/local"
 HELPER_SCRIPTS_DIR="${BASE_DIR}/helper-scripts"
 
-echo $HELPER_SCRIPTS_DIR
-
 CLOUD="$1"
 REGION="$2"
 GCP_PROJECT_ID="$3"

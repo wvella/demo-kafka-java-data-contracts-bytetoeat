@@ -148,7 +148,7 @@ resource "confluent_role_binding" "env_manager_resource_owner_kek_shared" {
 
 resource "confluent_api_key" "app_consumer_schema_registry_api_key" {
   display_name = "app_consumer_schema_registry_api_key-${var.unique_id}"
-  description  = "Schema Registry API Key that is owned by 'app-consumer' service account"
+  description  = "Schema Registry API Key that is owned by 'app_consumer' service account"
   owner {
     id          = confluent_service_account.app_consumer.id
     api_version = confluent_service_account.app_consumer.api_version
@@ -167,8 +167,8 @@ resource "confluent_api_key" "app_consumer_schema_registry_api_key" {
 
 }
 
-// 'app-manager' service account is required in this configuration to create 'raw.recipes' topic and assign roles
-// to 'app-producer' and 'app-consumer' service accounts.
+// 'app_manager' service account is required in this configuration to create 'raw.recipes' topic and assign roles
+// to 'app_producer' and 'app_consumer' service accounts.
 resource "confluent_service_account" "app_manager" {
   display_name = "app_manager-${var.unique_id}"
   description  = "Service account to manage 'restaurant' Kafka cluster"
@@ -182,7 +182,7 @@ resource "confluent_role_binding" "app_manager_kafka_cluster_admin" {
 
 resource "confluent_api_key" "app_manager_kafka_api_key" {
   display_name = "app_manager_kafka_api_key-${var.unique_id}"
-  description  = "Kafka API Key that is owned by 'app-manager' service account"
+  description  = "Kafka API Key that is owned by 'app_manager' service account"
   owner {
     id          = confluent_service_account.app_manager.id
     api_version = confluent_service_account.app_manager.api_version
@@ -199,11 +199,11 @@ resource "confluent_api_key" "app_manager_kafka_api_key" {
     }
   }
 
-  # The goal is to ensure that confluent_role_binding.app-manager-kafka-cluster-admin is created before
-  # confluent_api_key.app-manager-kafka-api-key is used to create instances of
+  # The goal is to ensure that confluent_role_binding.app_manager_kafka_cluster_admin is created before
+  # confluent_api_key.app_manager_kafka_api_key is used to create instances of
   # confluent_kafka_topic, confluent_kafka_acl resources.
 
-  # 'depends_on' meta-argument is specified in confluent_api_key.app-manager-kafka-api-key to avoid having
+  # 'depends_on' meta-argument is specified in confluent_api_key.app_manager_kafka_api_key to avoid having
   # multiple copies of this definition in the configuration which would happen if we specify it in
   # confluent_kafka_topic, confluent_kafka_acl resources instead.
   depends_on = [
@@ -278,7 +278,7 @@ resource "confluent_service_account" "app_consumer" {
 
 resource "confluent_api_key" "app_consumer_kafka_api_key" {
   display_name = "app_consumer_kafka_api_key-${var.unique_id}"
-  description  = "Kafka API Key that is owned by 'app-consumer' service account"
+  description  = "Kafka API Key that is owned by 'app_consumer' service account"
   owner {
     id          = confluent_service_account.app_consumer.id
     api_version = confluent_service_account.app_consumer.api_version
@@ -327,7 +327,7 @@ resource "confluent_service_account" "app_producer" {
 
 resource "confluent_api_key" "app_producer_kafka_api_key" {
   display_name = "app_producer_kafka_api_key-${var.unique_id}"
-  description  = "Kafka API Key that is owned by 'app-producer' service account"
+  description  = "Kafka API Key that is owned by 'app_producer' service account"
   owner {
     id          = confluent_service_account.app_producer.id
     api_version = confluent_service_account.app_producer.api_version
@@ -345,7 +345,7 @@ resource "confluent_api_key" "app_producer_kafka_api_key" {
   }
 }
 
-// Note that in order to consume from a topic, the principal of the consumer ('app-consumer' service account)
+// Note that in order to consume from a topic, the principal of the consumer ('app_consumer' service account)
 // needs to be authorized to perform 'READ' operation on both Topic and Group resources:
 resource "confluent_role_binding" "app_consumer_developer_recipes_read_from_topic" {
   principal   = "User:${confluent_service_account.app_consumer.id}"
