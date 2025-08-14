@@ -1,7 +1,7 @@
 #!/bin/bash
 # export DOCKER_USERNAME=xyz
 
-export IMAGE_TAG=1.0.0
+#export IMAGE_TAG=1.0.0
 # TODO: Refactor to parameterize versions
 # Producer Recipes v1
 make build-multi-arch SERVICE=byte-to-eat-v1-docker-producer-recipes IMAGE_NAME=byte-to-eat-docker-producer-recipes IMAGE_TAG=2.0.0
