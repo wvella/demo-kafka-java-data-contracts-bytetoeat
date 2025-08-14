@@ -13,6 +13,7 @@ SUBJECTS=("raw.recipes-value" "raw.orders-value" "enriched_orders-value") # Add 
 
 mkdir -p ${TERRAFORM_DIR}/subjects
 
+# TODO: Need to add a check to see if the subject exists before deleting it (or suppress errors)
 for SUBJECT in "${SUBJECTS[@]}"; do
     echo "Deleting subject: ${SUBJECT}"
 
