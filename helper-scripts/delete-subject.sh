@@ -53,7 +53,7 @@ for SUBJECT in "${SUBJECTS[@]}"; do
     curl --silent -u "${SR_API_KEY}:${SR_API_SECRET}" -X DELETE "${SR_URL}/dek-registry/v1/keks/bytetoeat-${UNIQUE_ID}-kek-shared/deks/${SUBJECT}?algorithm=AES256_GCM&permanent=false" | jq 'select(.error_code != 40470)'
 
     # Hard delete the subject
-    echo "Performing hard delete on KEKfor subject: $SUBJECT"
+    echo "Performing hard delete on KEK for subject: $SUBJECT"
     #curl --silent -u "$SR_API_KEY:$SR_API_SECRET" -X DELETE "$SR_URL/subjects/$SUBJECT?permanent=true" | jq .
     curl --silent -u "${SR_API_KEY}:${SR_API_SECRET}" -X DELETE "${SR_URL}/dek-registry/v1/keks/bytetoeat-${UNIQUE_ID}-kek/deks/${SUBJECT}?algorithm=AES256_GCM&permanent=true" | jq 'select(.error_code != 40470)'
     curl --silent -u "${SR_API_KEY}:${SR_API_SECRET}" -X DELETE "${SR_URL}/dek-registry/v1/keks/bytetoeat-${UNIQUE_ID}-kek-shared/deks/${SUBJECT}?algorithm=AES256_GCM&permanent=true" | jq 'select(.error_code != 40470)'
