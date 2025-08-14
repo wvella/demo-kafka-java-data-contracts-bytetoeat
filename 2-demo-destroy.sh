@@ -10,14 +10,28 @@ TERRAFORM_WORKING_DIR="${BASE_DIR}/local"
 DELETE_SUBJECT_SCRIPT="${BASE_DIR}/helper-scripts/delete-subject.sh" # Path to the delete-subject.sh script
 DELETE_AZURE_SCRIPT="${BASE_DIR}/helper-scripts/delete-azure-apps.sh" # Path to the delete-azure-apps.sh script
 DOWN_SCRIPT="${BASE_DIR}/0-down.sh"
-
 CLOUD="${1}"
 REGION="${2}"
 GCP_PROJECT_ID="${3}"
 
+# If cloud is not set, check if it is in the terraform working directory
 if [[ "$CLOUD" != "aws" && "$CLOUD" != "azure" && "$CLOUD" != "gcp" ]]; then
-  echo "Usage: $0 [aws|azure|gcp] <region> [<gcp-project-id>]"
-  exit 1
+  if [[ -f "${TERRAFORM_WORKING_DIR}/cloud" ]]; then
+    CLOUD=$(cat "${TERRAFORM_WORKING_DIR}/cloud")
+  else
+    echo "Usage: $0 [aws|azure|gcp] <region> [<gcp-project-id>]"
+    exit 1
+  fi
+fi
+
+# If region is not set, check if it is in the terraform working directory
+if [[ -z "${REGION}" ]] && [[ -f "${TERRAFORM_WORKING_DIR}/region" ]]; then
+  REGION=$(cat "${TERRAFORM_WORKING_DIR}/region")
+fi
+
+# If GCP project id is not set, check if it is in the terraform working directory
+if [[ -z "${GCP_PROJECT_ID}" ]] && [[ -f "${TERRAFORM_WORKING_DIR}/gcp_project_id" ]]; then
+  GCP_PROJECT_ID=$(cat "${TERRAFORM_WORKING_DIR}/gcp_project_id")
 fi
 
 TFVARS_FILE="${TERRAFORM_WORKING_DIR}/$CLOUD-terraform-secret.auto.tfvars"

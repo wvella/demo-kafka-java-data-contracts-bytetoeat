@@ -32,6 +32,23 @@ fi
 
 mkdir -p ${TERRAFORM_WORKING_DIR}/avro
 
+echo "${CLOUD}" > "${TERRAFORM_WORKING_DIR}/cloud"
+echo "${REGION}" > "${TERRAFORM_WORKING_DIR}/region"
+if [[ -n "${GCP_PROJECT_ID}" ]]; then
+  echo "${GCP_PROJECT_ID}" > "${TERRAFORM_WORKING_DIR}/gcp_project_id"
+fi
+
+# If CC env variables are set, populate tfvars
+if [[ -n "${CONFLUENT_CLOUD_API_KEY}" ]] && [[ -n "${CONFLUENT_CLOUD_API_SECRET}" ]]; then
+  if [ -f "${TERRAFORM_WORKING_DIR}/terraform.tfvars" ]; then
+    echo "${TERRAFORM_WORKING_DIR}/terraform.tfvars already exists"
+  else
+    echo "Using environment variables CONFLUENT_CLOUD_API_KEY and CONFLUENT_CLOUD_API_SECRET to authenticate to Confluent Cloud"
+    echo "confluent_cloud_api_key = \"${CONFLUENT_CLOUD_API_KEY}\"" >> "${TERRAFORM_WORKING_DIR}/terraform.tfvars"
+    echo "confluent_cloud_api_secret = \"${CONFLUENT_CLOUD_API_SECRET}\"" >> "${TERRAFORM_WORKING_DIR}/terraform.tfvars"
+  fi
+fi
+
 cp -rvp ${TERRAFORM_BASE_DIR}/confluent/* ${TERRAFORM_WORKING_DIR}
 cp -rvp ${TERRAFORM_BASE_DIR}/${CLOUD}/* ${TERRAFORM_WORKING_DIR}
 cp -rvp ${BASE_DIR}/byte-to-eat-v1-docker-producer-recipes/src/main/resources/avro/schema-raw.recipe-value.avsc ${TERRAFORM_WORKING_DIR}/avro/schema-raw.recipe-value.avsc
