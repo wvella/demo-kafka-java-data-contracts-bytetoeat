@@ -54,6 +54,7 @@ cp -rvp ${TERRAFORM_BASE_DIR}/${CLOUD}/* ${TERRAFORM_WORKING_DIR}
 cp -rvp ${BASE_DIR}/byte-to-eat-v1-docker-producer-recipes/src/main/resources/avro/schema-raw.recipe-value.avsc ${TERRAFORM_WORKING_DIR}/avro/schema-raw.recipe-value.avsc
 cp -rvp ${BASE_DIR}/byte-to-eat-v1-docker-producer-orders/src/main/resources/avro/schema-raw.order-value.avsc ${TERRAFORM_WORKING_DIR}/avro/schema-raw.order-value.avsc
 cp -rvp ${BASE_DIR}/byte-to-eat-v1-docker-producer-orders/src/main/resources/avro/schema-enriched_orders-value.avsc ${TERRAFORM_WORKING_DIR}/avro/schema-enriched_orders-value.avsc
+cp -rvp ${BASE_DIR}/dev/avro/*.avsc ${TERRAFORM_WORKING_DIR}/avro/
 
 
 # Initialize Terraform
@@ -111,7 +112,6 @@ fi
 
 echo "Terraform apply completed successfully."
 
-
 # Run microservices
 echo "Running microservices ..."
 
@@ -126,3 +126,13 @@ else
   echo "Error: $RECIPE_SCRIPT not found."
   exit 1
 fi
+
+echo "Running terraform refresh..."
+terraform -chdir="${TERRAFORM_WORKING_DIR}" refresh
+if [ $? -ne 0 ]; then
+  echo "Error: Terraform refresh failed."
+  exit 1
+fi
+
+terraform -chdir="${TERRAFORM_WORKING_DIR}" output -raw console_dev_producer_command
+terraform -chdir="${TERRAFORM_WORKING_DIR}" output -raw console_dev_producer_sample_message

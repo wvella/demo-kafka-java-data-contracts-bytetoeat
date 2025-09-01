@@ -1,3 +1,39 @@
+# Confluent Data Governance Resources
+# * PII tag
+# * Sensitive tag
+# * raw.recipes-value schema
+# * raw.orders-value schema
+# * enriched_orders-value schema
+# * dev.orders-value schema
+
+resource "confluent_tag" "pii" {
+  schema_registry_cluster {
+    id = data.confluent_schema_registry_cluster.advanced.id
+  }
+  rest_endpoint = data.confluent_schema_registry_cluster.advanced.rest_endpoint
+  credentials {
+    key    = confluent_api_key.env_manager_schema_registry_api_key.id
+    secret = confluent_api_key.env_manager_schema_registry_api_key.secret
+  }
+
+  name        = "PII"
+  description = "PII tag"
+}
+
+resource "confluent_tag" "sensitive" {
+  schema_registry_cluster {
+    id = data.confluent_schema_registry_cluster.advanced.id
+  }
+  rest_endpoint = data.confluent_schema_registry_cluster.advanced.rest_endpoint
+  credentials {
+    key    = confluent_api_key.env_manager_schema_registry_api_key.id
+    secret = confluent_api_key.env_manager_schema_registry_api_key.secret
+  }
+
+  name        = "Sensitive"
+  description = "Sensitive tag"
+}
+
 resource "confluent_schema" "raw_recipes_value" {
   schema_registry_cluster {
     id = data.confluent_schema_registry_cluster.advanced.id
@@ -143,36 +179,6 @@ resource "confluent_schema" "raw_orders_value" {
 
 }
 
-resource "confluent_tag" "pii" {
-  schema_registry_cluster {
-    id = data.confluent_schema_registry_cluster.advanced.id
-  }
-  rest_endpoint = data.confluent_schema_registry_cluster.advanced.rest_endpoint
-  credentials {
-    key    = confluent_api_key.env_manager_schema_registry_api_key.id
-    secret = confluent_api_key.env_manager_schema_registry_api_key.secret
-  }
-
-  name        = "PII"
-  description = "PII tag"
-
-}
-
-resource "confluent_tag" "sensitive" {
-  schema_registry_cluster {
-    id = data.confluent_schema_registry_cluster.advanced.id
-  }
-  rest_endpoint = data.confluent_schema_registry_cluster.advanced.rest_endpoint
-  credentials {
-    key    = confluent_api_key.env_manager_schema_registry_api_key.id
-    secret = confluent_api_key.env_manager_schema_registry_api_key.secret
-  }
-
-  name        = "Sensitive"
-  description = "Sensitive tag"
-
-}
-
 resource "confluent_schema" "enriched_orders_value" {
   schema_registry_cluster {
     id = data.confluent_schema_registry_cluster.advanced.id
@@ -193,5 +199,43 @@ resource "confluent_schema" "enriched_orders_value" {
   depends_on = [
     confluent_role_binding.env_manager_kafka_cluster_admin
   ]
+}
 
+resource "confluent_schema" "dev_orders_value" {
+  schema_registry_cluster {
+    id = data.confluent_schema_registry_cluster.advanced.id
+  }
+  rest_endpoint      = data.confluent_schema_registry_cluster.advanced.rest_endpoint
+  subject_name       = "dev.orders-value"
+  format             = "AVRO"
+  schema             = file("${path.module}/avro/schema-dev.orders-value.avsc")
+  recreate_on_update = false
+  hard_delete        = true
+
+  // additional rules:
+  ruleset {
+    domain_rules {
+      name = "encrypt_pii"
+      doc  = "Encrypt all fields which are tagged with PII"
+      kind = "TRANSFORM"
+      type = "ENCRYPT"
+      mode = "WRITEREAD"
+      tags = [confluent_tag.pii.name]
+      params = {
+        "encrypt.kek.name" = confluent_schema_registry_kek.cc_kek_shared.name
+      }
+      on_failure = "ERROR,NONE"
+    }
+    // END Data Encryption Rules
+  }
+
+  credentials {
+    key    = confluent_api_key.env_manager_schema_registry_api_key.id
+    secret = confluent_api_key.env_manager_schema_registry_api_key.secret
+  }
+
+  // This shouldn't be required, but TF doesn't fully respect the dependency graph for Role Bindings and Tags
+  depends_on = [
+    confluent_role_binding.env_manager_kafka_cluster_admin
+  ]
 }
