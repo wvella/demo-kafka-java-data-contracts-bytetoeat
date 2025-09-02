@@ -27,6 +27,23 @@ This project demonstrates **4 key capabilities of Data Contracts**:
 - **Recipe Producer**: Sends a single recipe, including ingredients, steps, and chef info to the Kafka topic `raw.recipes` in Confluent Cloud, then terminates.
 - **Recipe Consumer**: Consume recipes from `raw.recipes`
 
+
+
+#### A note on dependencies required for Data Contract Rules and CSFLE
+
+Data Contract Rules and CSFLE is built into the `io.confluent.kafka-avro-serializer`, `io.confluent.kafka-json-schema-serializer`, and `io.confluent.kafka-protobuf-serializer` dependencies. However, you must also include the following additional dependencies depending on your scenario:
+
+1. If you need to execte Rules, you will need to include:
+   - `io.confluent.kafka-schema-rules` - To execute rules
+
+2. For CSFLE, if the KEK is shared with Confluent, you will need to include:
+
+   - `io.confluent.kafka-schema-registry-client-encryption` - To execute *ENCRYPT* rules. **Note:** Any of the `io.confluent.kafka-schema-registry-client-encryption-[aws|gcp|azure|hcvault]` cloud-specfic dependencies also work here.
+
+1. For CSFLE, if the KEK is not shared with Confluent, you will need to include:
+
+   - `io.confluent.kafka-schema-registry-client-encryption-[aws|gcp|azure|hcvault]` - To execute *ENCRYPT* rules and integrate with the KMS.
+
 #### Demo Overview
 
 Prior to running the demo, set up the infrastructure for the demo and start these client applications (and Flink job, etc.):
@@ -39,10 +56,10 @@ The demo follows these high-level steps:
 
 1. **Explanation**: Provide an overview of data flow through the provisioned infrastructure
 1. **Data Quality Rule (`raw.recipes`)**: Show how a data quality rule can prevent semantically incorrect data from landing in Kafka topic.
-   
+
    The `raw.recipes` topic has a rule that must include multiple ingredients; invalid recipes will end up in a dead letter queue (`raw.recipes.dlq`)
 1. **Data Transformation Rule (`raw.recipes`)**:  Show how a data transformation rule can modify data before it lands in a Kafka topic.
-   
+
    Both the `raw.orders` and `raw.recipes` topics have a data transformation rule that does three things to the `recipe_id` field:
       * Replace spaces with dashes
       * Converts to lower case
@@ -94,7 +111,7 @@ See the `demo-recording-480p.mp4` file in the directory
       _If you don't specify Confluent Cloud credentials, you'll be prompted for them during the deployment process_
 
    1. Set up cloud-provider specific credentials
-      
+
       **AWS**: Set the following environment variables:
 
          ```shell
@@ -121,15 +138,15 @@ See the `demo-recording-480p.mp4` file in the directory
 1. **Deploy the Demo**
 
    From the main directory, run the deployment script. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
-   
+
    **AWS** or **Azure**
-      
+
    ```shell
    ./1-demo-deploy.sh [cloud] [region]
    ```
 
    **GCP** (provide a project ID)
-   
+
    ```shell
    ./1-demo-deploy.sh [cloud] [region] [gcp-project-id]
    ```
@@ -141,7 +158,7 @@ See the `demo-recording-480p.mp4` file in the directory
 1. **Demo Cleanup**
 
    #### **AWS** or **Azure**
-      
+
    ```shell
    ./demo-destroy.sh [cloud] [region]
    ```
@@ -189,12 +206,12 @@ See the `demo-recording-480p.mp4` file in the directory
 
 1. **Data Quality Rules**
 
-   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `require_more_than_one_ingredient` 
-   
+   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `require_more_than_one_ingredient`
+
       _Alternately, navigate to "Stream Governance" > "Total data contracts" > "raw.recipes-value" > "Rules"_
 
    1. Reconfigure the recipe producer to send an invalid message
-      
+
       1. Edit `./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml` with:
 
 
@@ -217,7 +234,7 @@ See the `demo-recording-480p.mp4` file in the directory
       ```
 
    1. In the Confluent Cloud UI, show the invalid message ending up in the `raw.recipes.dlq` topic.
-   
+
    1. Undo the change to `recipe-configuration.yaml` (`./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml`), and re-deploy:
 
          ```shell
@@ -225,8 +242,8 @@ See the `demo-recording-480p.mp4` file in the directory
          ```
 
 1. **Data Transformation Rules**
-   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `transform_recipe_name_to_valid_recipe_id` 
-   
+   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `transform_recipe_name_to_valid_recipe_id`
+
       _Alternately, navigate to "Stream Governance" > "Total data contracts" > "raw.recipes-value" > "Rules"_
 
    1. Look at the unmodified recipe being produced by running this command:
@@ -316,7 +333,7 @@ See the `demo-recording-480p.mp4` file in the directory
 ## Demo Cleanup
 
    #### **AWS** or **Azure**
-      
+
    ```shell
    ./demo-destroy.sh [cloud] [region]
    ```
