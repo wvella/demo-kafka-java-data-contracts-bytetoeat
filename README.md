@@ -54,20 +54,20 @@ Prior to running the demo, set up the infrastructure for the demo and start thes
 The demo follows these high-level steps:
 
 1. **Explanation**: Provide an overview of data flow through the provisioned infrastructure
-2. **Data Quality Rule (`raw.recipes`)**: Show how a data quality rule can prevent semantically incorrect data from landing in Kafka topic.
+1. **Data Quality Rule (`raw.recipes`)**: Show how a data quality rule can prevent semantically incorrect data from landing in Kafka topic.
 
    The `raw.recipes` topic has a rule that must include multiple ingredients; invalid recipes will end up in a dead letter queue (`raw.recipes.dlq`)
-3. **Data Transformation Rule (`raw.recipes`)**:  Show how a data transformation rule can modify data before it lands in a Kafka topic.
+1. **Data Transformation Rule (`raw.recipes`)**:  Show how a data transformation rule can modify data before it lands in a Kafka topic.
 
    Both the `raw.orders` and `raw.recipes` topics have a data transformation rule that does three things to the `recipe_id` field:
    - Replace spaces with dashes
    - Converts to lower case
    - Prefixes the recipe with `id-recipe`
-4. **Data Encryption Rule (`raw.orders` and `raw.recipes`)**: Shows how Client-Side Field Level Encryption (CSFLE) can be used to encrypt fields tagged with specific properties
+1. **Data Encryption Rule (`raw.orders` and `raw.recipes`)**: Shows how Client-Side Field Level Encryption (CSFLE) can be used to encrypt fields tagged with specific properties
    - The `raw.orders` topic has a rule that encrypts the fields tagged as `PII`
    - Each order initially has two fields tagged as `PII`: `customer_address` and `ccn` (Credit Card Number)
    - In the demo, we add a `PII` tag to an existing field (`customer_name`) and show how new messages are automatically encrypted.
-5. **Schema Migration Rules (`raw.recipes`)**: Shows how a rule can handle breaking schema changes
+1. **Schema Migration Rules (`raw.recipes`)**: Shows how a rule can handle breaking schema changes
    - In Version 1 of the Recipes producer and consumer, we have field `chef_name`; this field is split into `chef_first_name` and `chef_last_name` in Version 2 of the applications.
    - v1 and v2 of both the Recipe Producer and Recipe Consumer are able to handle both versions of the data, where the schema migration rule automatically updates the field on the fly.
 
@@ -288,17 +288,17 @@ See the `demo-recording-480p.mp4` file in the directory
       ./helper-scripts/register-migration-rules.sh
       ```
 
-   2. Start the V2 version of the recipe applications
+   1. Start the V2 version of the recipe applications
 
       ```shell
       ./helper-scripts/start-recipe-v2.sh
       ```
 
-   3. Show the new `raw.recipe-value` Data Contract in the Confluent Cloud UI. Notice that `application.major.version` is now set to 2.
+   1. Show the new `raw.recipe-value` Data Contract in the Confluent Cloud UI. Notice that `application.major.version` is now set to 2.
 
-   4. Show the `split_chef_first_and_last_name` and `join_chef_first_and_last_name` migration rules in the Confluent Cloud UI.
+   1. Show the `split_chef_first_and_last_name` and `join_chef_first_and_last_name` migration rules in the Confluent Cloud UI.
 
-   5. Look at logs for the four recipe applications:
+   1. Look at logs for the four recipe applications:
 
       1. View logs for the V1 producer in Window 1:
 
@@ -306,25 +306,25 @@ See the `demo-recording-480p.mp4` file in the directory
          docker logs producer-recipes
          ```
 
-      2. View logs for the V1 consumer is Window 2.
+      1. View logs for the V1 consumer is Window 2.
 
          ```shell
          docker logs consumer-recipes
          ```
 
-      3. View logs for the V2 producer in Window 3
+      1. View logs for the V2 producer in Window 3
 
          ```shell
          docker logs producer-recipes-v2
          ```
 
-      4. View logs for the V2 consumer is Window 4
+      1. View logs for the V2 consumer is Window 4
 
          ```shell
          docker logs consumer-recipes-v2
          ```
 
-      5. Compare the output data for the different versions of the application
+      1. Compare the output data for the different versions of the application
 
 1. Once the demo is complete, clean up your resources following the instructions in [Demo Cleanup](#demo-cleanup)
 
