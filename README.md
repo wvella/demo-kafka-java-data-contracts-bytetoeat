@@ -29,7 +29,7 @@ This project demonstrates **4 key capabilities of Data Contracts**:
 
 #### A note on dependencies required for Data Contract Rules and CSFLE
 
-Data Contract Rules and CSFLE is built into the `io.confluent.kafka-avro-serializer`, `io.confluent.kafka-json-schema-serializer`, and `io.confluent.kafka-protobuf-serializer` dependencies. However, you must also include the following additional dependencies depending on your scenario:
+Data Contract Rules and CSFLE are built into the `io.confluent.kafka-avro-serializer`, `io.confluent.kafka-json-schema-serializer`, and `io.confluent.kafka-protobuf-serializer` dependencies. However, you must also include the following additional dependencies depending on your scenario:
 
 1. If you need to execute Rules, you will need to include:
    - `io.confluent.kafka-schema-rules`
