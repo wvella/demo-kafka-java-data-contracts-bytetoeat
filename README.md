@@ -36,7 +36,7 @@ Data Contract Rules and CSFLE are built into the `io.confluent.kafka-avro-serial
 
 1. For CSFLE, if the KEK is shared with Confluent, you will need to include:
 
-   - `io.confluent.kafka-schema-registry-client-encryption` - To execute *ENCRYPT* rules. **Note:** Any of the `io.confluent.kafka-schema-registry-client-encryption-[aws|gcp|azure|hcvault]` cloud-specfic dependencies also work here.
+   - `io.confluent.kafka-schema-registry-client-encryption` - To execute *ENCRYPT* rules. **Note:** Any of the `io.confluent.kafka-schema-registry-client-encryption-[aws|gcp|azure|hcvault]` cloud-specific dependencies also work here.
 
 1. For CSFLE, if the KEK is not shared with Confluent, you will need to include:
 
