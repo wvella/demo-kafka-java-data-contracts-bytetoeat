@@ -14,53 +14,70 @@ This project demonstrates **4 key capabilities of Data Contracts**:
 
 ### 🍲 How It Works
 
-#### Managed Confluent Cloud Components:
+#### Managed Confluent Cloud Components
 
 - **Kafka Cluster**: Confluent Cloud cluster, through which all data flows.
 - **Schema Registry**: Ensures proper validation and schema management for the recipes and orders, and stores various rules.
 - **Flink**: Consumes `raw.orders` and enriches them with the latest recipe from `raw.recipes`, and produces the result to `enriched_orders` topic.
 
-#### Client Applications (run as local Docker containers):
+#### Client Applications (run as local Docker containers)
 
 - **Order Producer**: Simulates customer orders referencing recipes by their `recipe_id`, produces to `raw.orders`.
 - **Order Consumer**: Consumes orders from `raw.orders`
 - **Recipe Producer**: Sends a single recipe, including ingredients, steps, and chef info to the Kafka topic `raw.recipes` in Confluent Cloud, then terminates.
 - **Recipe Consumer**: Consume recipes from `raw.recipes`
 
+#### A note on dependencies required for Data Contract Rules and CSFLE
+
+Data Contract Rules and CSFLE are built into the `io.confluent.kafka-avro-serializer`, `io.confluent.kafka-json-schema-serializer`, and `io.confluent.kafka-protobuf-serializer` dependencies. However, you must also include the following additional dependencies depending on your scenario:
+
+1. If you need to execute Rules, you will need to include:
+   - `io.confluent.kafka-schema-rules`
+
+1. For CSFLE, if the KEK is shared with Confluent, you will need to include:
+
+   - `io.confluent.kafka-schema-registry-client-encryption` - To execute *ENCRYPT* rules. **Note:** Any of the `io.confluent.kafka-schema-registry-client-encryption-[aws|gcp|azure|hcvault]` cloud-specific dependencies also work here.
+
+1. For CSFLE, if the KEK is not shared with Confluent, you will need to include:
+
+   - `io.confluent.kafka-schema-registry-client-encryption-[aws|gcp|azure|hcvault]` - To execute *ENCRYPT* rules and integrate with the KMS.
+
 #### Demo Overview
 
 Prior to running the demo, set up the infrastructure for the demo and start these client applications (and Flink job, etc.):
-   * Order Producer
-   * Order Consumer
-   * Recipe Producer (v1)
-   * Recipe Consumer (v1)
+
+- Order Producer
+- Order Consumer
+- Recipe Producer (v1)
+- Recipe Consumer (v1)
 
 The demo follows these high-level steps:
 
 1. **Explanation**: Provide an overview of data flow through the provisioned infrastructure
 1. **Data Quality Rule (`raw.recipes`)**: Show how a data quality rule can prevent semantically incorrect data from landing in Kafka topic.
-   
+
    The `raw.recipes` topic has a rule that must include multiple ingredients; invalid recipes will end up in a dead letter queue (`raw.recipes.dlq`)
 1. **Data Transformation Rule (`raw.recipes`)**:  Show how a data transformation rule can modify data before it lands in a Kafka topic.
-   
+
    Both the `raw.orders` and `raw.recipes` topics have a data transformation rule that does three things to the `recipe_id` field:
-      * Replace spaces with dashes
-      * Converts to lower case
-      * Prefixes the recipe with `id-recipe`
+   - Replace spaces with dashes
+   - Converts to lower case
+   - Prefixes the recipe with `id-recipe`
 1. **Data Encryption Rule (`raw.orders` and `raw.recipes`)**: Shows how Client-Side Field Level Encryption (CSFLE) can be used to encrypt fields tagged with specific properties
-   * The `raw.orders` topic has a rule that encrypts the fields tagged as `PII`
-   * Each order initially has two fields tagged as `PII`: `customer_address` and `ccn` (Credit Card Number)
-   * In the demo, we add a `PII` tag to an existing field (`customer_name`) and show how new messages are automatically encrypted.
+   - The `raw.orders` topic has a rule that encrypts the fields tagged as `PII`
+   - Each order initially has two fields tagged as `PII`: `customer_address` and `ccn` (Credit Card Number)
+   - In the demo, we add a `PII` tag to an existing field (`customer_name`) and show how new messages are automatically encrypted.
 1. **Schema Migration Rules (`raw.recipes`)**: Shows how a rule can handle breaking schema changes
-   * In Version 1 of the Recipes producer and consumer, we have field `chef_name`; this field is split into `chef_first_name` and `chef_last_name` in Version 2 of the applications.
-   * v1 and v2 of both the Recipe Producer and Recipe Consumer are able to handle both versions of the data, where the schema migration rule automatically updates the field on the fly.
+   - In Version 1 of the Recipes producer and consumer, we have field `chef_name`; this field is split into `chef_first_name` and `chef_last_name` in Version 2 of the applications.
+   - v1 and v2 of both the Recipe Producer and Recipe Consumer are able to handle both versions of the data, where the schema migration rule automatically updates the field on the fly.
 
 #### Demo Architecture
+
 ![demo-architecture](byte-to-eat-demo-architecture.png)
 
 #### Demo Recording
-See the `demo-recording-480p.mp4` file in the directory
 
+See the `demo-recording-480p.mp4` file in the directory
 
 ### 🔧 Built With
 
@@ -91,10 +108,10 @@ See the `demo-recording-480p.mp4` file in the directory
       confluent_cloud_api_secret = "<<confluent_cloud_api_secret_for_terraform>>"
       ```
 
-      _If you don't specify Confluent Cloud credentials, you'll be prompted for them during the deployment process_
+      *If you don't specify Confluent Cloud credentials, you'll be prompted for them during the deployment process*
 
    1. Set up cloud-provider specific credentials
-      
+
       **AWS**: Set the following environment variables:
 
          ```shell
@@ -116,20 +133,20 @@ See the `demo-recording-480p.mp4` file in the directory
          gcloud auth application-default login
          ```
 
-      _GCP also requires a project-id, provided on the command-line (see below)._
+      *GCP also requires a project-id, provided on the command-line (see below).*
 
 1. **Deploy the Demo**
 
    From the main directory, run the deployment script. This script will deploy all the resources in Confluent Cloud and produce a Spaghetti Bolognese recipe to the topic. 🍝 Yum!
-   
+
    **AWS** or **Azure**
-      
+
    ```shell
    ./1-demo-deploy.sh [cloud] [region]
    ```
 
    **GCP** (provide a project ID)
-   
+
    ```shell
    ./1-demo-deploy.sh [cloud] [region] [gcp-project-id]
    ```
@@ -140,13 +157,13 @@ See the `demo-recording-480p.mp4` file in the directory
 
 1. **Demo Cleanup**
 
-   #### **AWS** or **Azure**
-      
+   **AWS** or **Azure**
+
    ```shell
    ./demo-destroy.sh [cloud] [region]
    ```
 
-   #### **GCP** (provide a project ID)
+   **GCP** (provide a project ID)
 
    ```shell
    ./demo-destroy.sh [cloud] [region] [gcp-project-id]
@@ -159,7 +176,7 @@ See the `demo-recording-480p.mp4` file in the directory
 
    1. In a terminal, ensure Docker is running
 
-   1. _(Optional)_ Open VS Code in the root of the cloned git repo (these commands can be run in the VS Code built-in terminal)
+   1. *(Optional)* Open VS Code in the root of the cloned git repo (these commands can be run in the VS Code built-in terminal)
 
       1. Open `ProducerAvroRecipes.java`
 
@@ -180,7 +197,6 @@ See the `demo-recording-480p.mp4` file in the directory
          code ./byte-to-eat-v2-docker-producer-recipes/src/main/resources/avro/schema-raw.recipe-value-v2.avsc
          ```
 
-
    1. Open 4 Terminal Windows to compare the v1 and v2 versions of the Recipe Producer/Consumer:
       1. Window 1: V1 Producer (White Background)
       1. Window 2: V2 Producer (Black Background)
@@ -189,20 +205,19 @@ See the `demo-recording-480p.mp4` file in the directory
 
 1. **Data Quality Rules**
 
-   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `require_more_than_one_ingredient` 
-   
-      _Alternately, navigate to "Stream Governance" > "Total data contracts" > "raw.recipes-value" > "Rules"_
+   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `require_more_than_one_ingredient`
+
+      *Alternately, navigate to "Stream Governance" > "Total data contracts" > "raw.recipes-value" > "Rules"*
 
    1. Reconfigure the recipe producer to send an invalid message
-      
-      1. Edit `./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml` with:
 
+      1. Edit `./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml` with:
 
          ```yaml
                - LIST_ALL_INGREDIENTS=false
          ```
 
-         _If using the CLI, this file can be access directly via the symlink `recipe-configuration.yaml`. For example, open this file in **vim** with `vi recipe-configuration.yaml`_
+         *If using the CLI, this file can be access directly via the symlink `recipe-configuration.yaml`. For example, open this file in **vim** with `vi recipe-configuration.yaml`*
 
       1. Restart the (v1) recipe producer
 
@@ -217,7 +232,7 @@ See the `demo-recording-480p.mp4` file in the directory
       ```
 
    1. In the Confluent Cloud UI, show the invalid message ending up in the `raw.recipes.dlq` topic.
-   
+
    1. Undo the change to `recipe-configuration.yaml` (`./byte-to-eat-v1-docker-producer-recipes/docker-compose.yml`), and re-deploy:
 
          ```shell
@@ -225,9 +240,9 @@ See the `demo-recording-480p.mp4` file in the directory
          ```
 
 1. **Data Transformation Rules**
-   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `transform_recipe_name_to_valid_recipe_id` 
-   
-      _Alternately, navigate to "Stream Governance" > "Total data contracts" > "raw.recipes-value" > "Rules"_
+   1. In the Confluent Cloud UI, navigate to the `raw.recipes` topic and display the Data Contract rule `transform_recipe_name_to_valid_recipe_id`
+
+      *Alternately, navigate to "Stream Governance" > "Total data contracts" > "raw.recipes-value" > "Rules"*
 
    1. Look at the unmodified recipe being produced by running this command:
 
@@ -254,7 +269,7 @@ See the `demo-recording-480p.mp4` file in the directory
          1. Show the `raw.orders` Topic in the Confluent Cloud UI to show the `customer_name` field is now encrypted.
          1. **Bonus:** The consumer can only decrypt the field because it has access to the Key Encryption Key. Remove the access via the Confluent Cloud UI and the field won't be decrypted.
          1. **Bonus:** Flink is joining the `Orders` and `Recipes` together, and the encrypted field will be carried through.
-   1. _(Optional)_ Key Not Shared with Confluent
+   1. *(Optional)* Key Not Shared with Confluent
       1. Same as *Key Shared with Confluent* above, except you need credentials configured in the applications in order to access the KMS.
 
 1. **Schema Migration Rules**
@@ -263,9 +278,9 @@ See the `demo-recording-480p.mp4` file in the directory
 
    1. Compare v1 and v2 of the recipe schema (`schema-raw.recipe-value.avsc` and `schema-raw.recipe-value-v2.avsc`)
 
-      * In version 1, see the field `chef_name`
-      * In version 2, see the fields `chef_first_name` and `chef_last_name`
-      * This would normally be considered a breaking change.
+   - In version 1, see the field `chef_name`
+   - In version 2, see the fields `chef_first_name` and `chef_last_name`
+   - This would normally be considered a breaking change.
 
    1. Run `helper-scripts/register-migration-rules.sh` to register the new Data Contract and Migration Rules. Show `migration_rules.json`.
 
@@ -315,17 +330,17 @@ See the `demo-recording-480p.mp4` file in the directory
 
 ## Demo Cleanup
 
-   #### **AWS** or **Azure**
-      
-   ```shell
-   ./demo-destroy.sh [cloud] [region]
-   ```
+**AWS** or **Azure**
 
-   #### **GCP** (provide a project ID)
+```shell
+./demo-destroy.sh [cloud] [region]
+```
 
-   ```shell
-   ./demo-destroy.sh [cloud] [region] [gcp-project-id]
-   ```
+**GCP** (provide a project ID)
+
+```shell
+./demo-destroy.sh [cloud] [region] [gcp-project-id]
+```
 
 ## General Notes
 
@@ -337,23 +352,29 @@ See the `demo-recording-480p.mp4` file in the directory
 Before running this demo, make sure you have the following installed and configured:
 
 ### 🐳 Docker & Docker Compose
+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes Docker Compose)
 - Ensure Docker is running
 
 ### ☕ Java & Maven
+
 - Java 11 or later (Java 17+ recommended)
 - [Maven](https://maven.apache.org/) for building Java projects
 
 ### 🌍 Terraform
+
 - [Terraform CLI](https://developer.hashicorp.com/terraform/downloads) (v1.0+ recommended)
 
 ### 🧰 jq
+
 - [jq](https://stedolan.github.io/jq/) for JSON manipulation in shell scripts
 
 ### 🛠️ GNU Make
+
 - [Make](https://www.gnu.org/software/make/) for running Makefile targets
 
 ### ☁️ Cloud Provider Account
+
 - **AWS**, **Azure**, or **GCP** account (choose only one)
 - Credentials and access configured for Terraform
 - Cloud CLI (if deploying into Azure or GCP)
