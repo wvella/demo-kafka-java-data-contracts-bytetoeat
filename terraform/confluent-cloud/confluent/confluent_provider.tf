@@ -1,8 +1,10 @@
+# Required providers block comes from the cloud provider TF templates
+# Do NOT add required providers block to this file
 # terraform {
 #   required_providers {
 #     confluent = {
 #       source  = "confluentinc/confluent"
-#       version = "2.24.0"
+#       version = ">= 2.24.0"
 #     }
 #   }
 # }

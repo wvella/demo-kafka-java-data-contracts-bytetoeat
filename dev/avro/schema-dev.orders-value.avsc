@@ -1,0 +1,29 @@
+{
+  "type": "record",
+  "name": "Order",
+  "namespace": "io.confluent.wvella.demo.datacontractsv0",
+  "fields": [
+    {
+      "name": "order_id",
+      "type": "string"
+    },
+    {
+      "confluent:tags": [
+        "PII"
+      ],
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "confluent:tags": [
+        "PII"
+      ],
+      "name": "email",
+      "type": "string"
+    },
+    {
+      "name": "recipe_id",
+      "type": "string"
+    }
+  ]
+}
